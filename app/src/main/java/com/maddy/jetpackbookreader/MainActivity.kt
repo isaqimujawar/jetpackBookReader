@@ -1,6 +1,7 @@
 package com.maddy.jetpackbookreader
 
 import android.os.Bundle
+import android.util.Log
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.foundation.layout.fillMaxSize
@@ -10,6 +11,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
+import com.google.firebase.firestore.FirebaseFirestore
 import com.maddy.jetpackbookreader.ui.theme.JetpackBookReaderTheme
 
 class MainActivity : ComponentActivity() {
@@ -17,11 +19,26 @@ class MainActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
         setContent {
             JetpackBookReaderTheme {
+
+                val db = FirebaseFirestore.getInstance()
+                val user: MutableMap<String, Any> = HashMap()
+                user["firstName"] = "John"
+                user["lastName"] = "Doe"
+
                 // A surface container using the 'background' color from the theme
                 Surface(
                     modifier = Modifier.fillMaxSize(),
                     color = MaterialTheme.colorScheme.background
                 ) {
+                    db.collection("users")
+                        .add(user)
+                        .addOnSuccessListener {
+                            Log.d("BookReaderFirebase", "onCreate: ${it.id}")
+                        }
+                        .addOnFailureListener {
+                            Log.d("BookReaderFirebase", "onCreate: ${it.localizedMessage}")
+                        }
+
                     Greeting("Android")
                 }
             }
