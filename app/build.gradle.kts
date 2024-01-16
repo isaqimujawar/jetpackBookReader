@@ -3,7 +3,7 @@ plugins {
     id("org.jetbrains.kotlin.android")
     kotlin("kapt")
     id("com.google.dagger.hilt.android")
-
+    id("com.google.gms.google-services")
 }
 
 android {
@@ -82,5 +82,10 @@ dependencies {
     // Hilt Integration with the Jetpack navigation library
     implementation("androidx.hilt:hilt-navigation-compose:1.1.0")
 
-
+    // Firebase Dependencies
+    // Import the Firebase BoM
+    implementation(platform("com.google.firebase:firebase-bom:32.7.0"))
+    // Firebase Authentication and Cloud Firestore
+    implementation("com.google.firebase:firebase-auth")
+    implementation("com.google.firebase:firebase-firestore")
 }
