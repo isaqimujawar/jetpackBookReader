@@ -97,4 +97,7 @@ dependencies {
     // Coroutine Lifecycle Scopes
     implementation ("androidx.lifecycle:lifecycle-viewmodel-ktx:2.7.0")
     implementation ("androidx.lifecycle:lifecycle-runtime-ktx:2.7.0")
+
+    // Jetpack Compose Navigation Component
+    implementation ("androidx.navigation:navigation-compose:2.7.6")
 }
