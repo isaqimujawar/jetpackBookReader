@@ -1,5 +1,8 @@
 package com.maddy.jetpackbookreader.navigation
 
+/**
+ * enumerate means - To count off or name one by one; list.
+ */
 enum class ReaderScreens {
     SplashScreen,
     LoginScreen,
