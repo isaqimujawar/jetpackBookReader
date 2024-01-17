@@ -23,6 +23,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.scale
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import com.maddy.jetpackbookreader.R
@@ -39,7 +40,7 @@ fun SplashScreen(navController: NavController) {
             .size(330.dp)
             .scale(alphaAnimation.value),
         shape = CircleShape,
-        color = Color.White,
+        color = MaterialTheme.colorScheme.surface,
         border = BorderStroke(width = 2.dp, color = Color.LightGray)
     ) {
         Column(
@@ -47,14 +48,15 @@ fun SplashScreen(navController: NavController) {
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
             Text(
-                text = stringResource(R.string.logo),
-                style = MaterialTheme.typography.titleLarge,
+                text = stringResource(R.string.logo_title),
+                style = MaterialTheme.typography.displaySmall,
+                fontWeight = FontWeight.Bold,
                 color = Color.Red.copy(alpha = 0.4f)
             )
             Spacer(modifier = Modifier.height(15.dp))
             Text(
-                text = stringResource(R.string.motto),
-                style = MaterialTheme.typography.headlineMedium,
+                text = stringResource(R.string.logo_motto),
+                style = MaterialTheme.typography.titleLarge,
                 color = Color.LightGray
             )
         }
@@ -82,7 +84,7 @@ private fun LaunchedEffectSplashScreen(
                     easing = { OvershootInterpolator(8f).getInterpolation(it) }
                 )
             )
-            delay(500L)
+            delay(800L)
             navController.navigate(ReaderScreens.LoginScreen.name)
         }
     )
