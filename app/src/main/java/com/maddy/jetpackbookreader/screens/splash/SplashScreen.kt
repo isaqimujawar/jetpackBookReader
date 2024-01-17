@@ -1,9 +1,9 @@
 package com.maddy.jetpackbookreader.screens.splash
 
-import android.window.SplashScreen
 import androidx.compose.runtime.Composable
+import androidx.navigation.NavController
 
 @Composable
-fun SplashScreen(){
+fun SplashScreen(navController: NavController) {
 
 }
