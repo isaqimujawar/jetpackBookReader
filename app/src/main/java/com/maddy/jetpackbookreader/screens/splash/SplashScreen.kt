@@ -26,6 +26,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import com.maddy.jetpackbookreader.R
+import com.maddy.jetpackbookreader.navigation.ReaderScreens
 import kotlinx.coroutines.delay
 
 @Composable
@@ -82,6 +83,7 @@ private fun LaunchedEffectSplashScreen(
                 )
             )
             delay(500L)
+            navController.navigate(ReaderScreens.LoginScreen.name)
         }
     )
 }
