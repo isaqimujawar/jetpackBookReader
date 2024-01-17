@@ -1,3 +1,5 @@
 <resources>
     <string name="app_name">Jetpack Book Reader</string>
+    <string name="logo">Book Reader App</string>
+    <string name="motto">\"Read. Change. Yourself\"</string>
 </resources>
