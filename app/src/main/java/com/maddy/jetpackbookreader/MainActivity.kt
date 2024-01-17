@@ -1,17 +1,18 @@
 package com.maddy.jetpackbookreader
 
 import android.os.Bundle
-import android.util.Log
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
-import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
-import com.google.firebase.firestore.FirebaseFirestore
+import com.maddy.jetpackbookreader.navigation.ReaderNavigation
 import com.maddy.jetpackbookreader.ui.theme.JetpackBookReaderTheme
 import dagger.hilt.android.AndroidEntryPoint
 
@@ -19,47 +20,32 @@ import dagger.hilt.android.AndroidEntryPoint
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContent {
-            JetpackBookReaderTheme {
-
-                val db = FirebaseFirestore.getInstance()
-                val user: MutableMap<String, Any> = HashMap()
-                user["firstName"] = "John"
-                user["lastName"] = "Doe"
-
-                // A surface container using the 'background' color from the theme
-                Surface(
-                    modifier = Modifier.fillMaxSize(),
-                    color = MaterialTheme.colorScheme.background
-                ) {
-                    db.collection("users")
-                        .add(user)
-                        .addOnSuccessListener {
-                            Log.d("BookReaderFirebase", "onCreate: ${it.id}")
-                        }
-                        .addOnFailureListener {
-                            Log.d("BookReaderFirebase", "onCreate: ${it.localizedMessage}")
-                        }
-
-                    Greeting("Android")
-                }
-            }
-        }
+        setContent { ReaderApp() }
     }
 }
 
 @Composable
-fun Greeting(name: String, modifier: Modifier = Modifier) {
-    Text(
-        text = "Hello $name!",
-        modifier = modifier
-    )
+private fun ReaderApp() {
+    JetpackBookReaderTheme {
+        // A surface container using the 'background' color from the theme
+        Surface(
+            modifier = Modifier.fillMaxSize(),
+            color = MaterialTheme.colorScheme.background
+        ) {
+            Column(
+                verticalArrangement = Arrangement.Center,
+                horizontalAlignment = Alignment.CenterHorizontally
+            ) {
+                ReaderNavigation()
+            }
+        }
+    }
 }
 
 @Preview(showBackground = true)
 @Composable
 fun GreetingPreview() {
     JetpackBookReaderTheme {
-        Greeting("Android")
+        ReaderApp()
     }
 }
