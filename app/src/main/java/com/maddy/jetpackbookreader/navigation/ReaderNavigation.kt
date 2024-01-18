@@ -4,6 +4,7 @@ import androidx.compose.runtime.Composable
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
+import com.maddy.jetpackbookreader.screens.createaccount.CreateAccountScreen
 import com.maddy.jetpackbookreader.screens.details.BookDetailsScreen
 import com.maddy.jetpackbookreader.screens.home.HomeScreen
 import com.maddy.jetpackbookreader.screens.login.LoginScreen
@@ -25,6 +26,9 @@ fun ReaderNavigation() {
         }
         composable(route = ReaderScreens.LoginScreen.name) {
             LoginScreen(navController = navController)
+        }
+        composable(route = ReaderScreens.CreateAccountScreen.name) {
+            CreateAccountScreen(navController = navController)
         }
         composable(route = ReaderScreens.HomeScreen.name) {
             HomeScreen(navController = navController)

@@ -9,9 +9,11 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Face
 import androidx.compose.material.icons.filled.Lock
@@ -43,8 +45,8 @@ import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import com.maddy.jetpackbookreader.R
-import com.maddy.jetpackbookreader.components.ReaderTopAppBar
 import com.maddy.jetpackbookreader.navigation.ReaderScreens
+import com.maddy.jetpackbookreader.widgets.ReaderTopAppBar
 
 @OptIn(ExperimentalComposeUiApi::class)
 @Composable
@@ -70,78 +72,83 @@ fun LoginScreen(navController: NavController) {
                 .fillMaxSize()
         ) {
             Column(
-                modifier = Modifier.padding(horizontal = 10.dp),
+                modifier = Modifier
+                    .padding(horizontal = 10.dp, vertical = 10.dp)
+                    .verticalScroll(rememberScrollState()),
                 verticalArrangement = Arrangement.Top,
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
-                OutlinedTextField(
-                    value = email,
-                    onValueChange = { email = it },
-                    modifier = Modifier.fillMaxWidth(),
-                    enabled = true,
-                    label = { Text(text = "Email") },
-                    placeholder = { Text(text = "Enter email") },
-                    keyboardOptions = KeyboardOptions(
-                        keyboardType = KeyboardType.Email,
-                        imeAction = ImeAction.Next
-                    ),
-                    keyboardActions = KeyboardActions.Default,
-                    singleLine = true,
-                    maxLines = 1,
-                    shape = RoundedCornerShape(size = 15.dp),
-                )
-                Spacer(modifier = Modifier.height(8.dp))
-                OutlinedTextField(
-                    value = password,
-                    onValueChange = { password = it },
-                    modifier = Modifier.fillMaxWidth(),
-                    enabled = true,
-                    label = { Text(text = "Password") },
-                    placeholder = { Text(text = "Enter password") },
-                    trailingIcon = { ShowTrailingIcon(passwordHidden) },
-                    visualTransformation = visualTransformation,
-                    keyboardOptions = KeyboardOptions(
-                        keyboardType = KeyboardType.Password,
-                        imeAction = ImeAction.Done
-                    ),
-                    keyboardActions = KeyboardActions(
-                        onDone = {
-                            keyboardController?.hide()
-                            // TODO()
-                        }
-                    ),
-                    singleLine = true,
-                    maxLines = 1,
-                    shape = RoundedCornerShape(size = 15.dp),
-                )
-                Spacer(modifier = Modifier.height(8.dp))
-                Button(
-                    onClick = { /*TODO*/ },
-                    enabled = valid,
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(8.dp),
-                ) {
-                    Text(text = "Login")
+                Column {
+                    OutlinedTextField(
+                        value = email,
+                        onValueChange = { email = it },
+                        modifier = Modifier
+                            .padding(8.dp)
+                            .fillMaxWidth(),
+                        enabled = true,
+                        label = { Text(text = stringResource(R.string.email)) },
+                        placeholder = { Text(text = stringResource(R.string.enter_email)) },
+                        keyboardOptions = KeyboardOptions(
+                            keyboardType = KeyboardType.Email,
+                            imeAction = ImeAction.Next
+                        ),
+                        keyboardActions = KeyboardActions.Default,
+                        singleLine = true,
+                        maxLines = 1,
+                        shape = RoundedCornerShape(size = 15.dp),
+                    )
+                    OutlinedTextField(
+                        value = password,
+                        onValueChange = { password = it },
+                        modifier = Modifier
+                            .padding(8.dp)
+                            .fillMaxWidth(),
+                        enabled = true,
+                        label = { Text(text = stringResource(R.string.password)) },
+                        placeholder = { Text(text = stringResource(R.string.enter_password)) },
+                        trailingIcon = { ShowTrailingIcon(passwordHidden) },
+                        visualTransformation = visualTransformation,
+                        keyboardOptions = KeyboardOptions(
+                            keyboardType = KeyboardType.Password,
+                            imeAction = ImeAction.Done
+                        ),
+                        keyboardActions = KeyboardActions(
+                            onDone = {
+                                keyboardController?.hide()
+                                // TODO()
+                            }
+                        ),
+                        singleLine = true,
+                        maxLines = 1,
+                        shape = RoundedCornerShape(size = 15.dp),
+                    )
+                    Button(
+                        onClick = { /*TODO*/ },
+                        enabled = valid,
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(8.dp),
+                    ) {
+                        Text(text = stringResource(R.string.login))
+                    }
                 }
-            }
-            Spacer(modifier = Modifier.height(30.dp))
-            Row(
-                modifier = Modifier.padding(horizontal = 15.dp),
-                horizontalArrangement = Arrangement.Center,
-                verticalAlignment = Alignment.CenterVertically
-            ) {
-                Text(text = "New User?")
-                Text(
-                    text = "Sign up",
-                    modifier = Modifier
-                        .padding(start = 5.dp)
-                        .clickable {
-                            navController.navigate(route = ReaderScreens.CreateAccountScreen.name)
-                        },
-                    fontWeight = FontWeight.Bold,
-                    color = Color.Blue
-                )
+                Spacer(modifier = Modifier.height(50.dp))
+                Row(
+                    horizontalArrangement = Arrangement.Center,
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Text(text = stringResource(R.string.new_user))
+                    Text(
+                        text = stringResource(R.string.sign_up),
+                        modifier = Modifier
+                            .padding(start = 5.dp)
+                            .clickable {
+                                navController.navigate(route = ReaderScreens.CreateAccountScreen.name)
+                            },
+                        fontWeight = FontWeight.Bold,
+                        color = Color.Blue
+                    )
+                }
             }
         }
     }
