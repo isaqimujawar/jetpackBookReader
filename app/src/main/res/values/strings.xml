@@ -3,4 +3,6 @@
     <string name="logo_title">Book Reader App</string>
     <string name="logo_motto">\"Read. Change. Yourself\"</string>
     <string name="back_arrow_icon">Back Arrow Icon</string>
+    <string name="show_password">Show password</string>
+    <string name="hide_password">Hide password</string>
 </resources>

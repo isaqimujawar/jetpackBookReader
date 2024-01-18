@@ -21,7 +21,7 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import com.maddy.jetpackbookreader.R
 
-@OptIn(ExperimentalMaterial3Api::class, ExperimentalMaterial3Api::class)
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ReaderTopAppBar(title: String = "Title", onNavigationIconClicked: () -> Unit = {}) {
     CenterAlignedTopAppBar(
