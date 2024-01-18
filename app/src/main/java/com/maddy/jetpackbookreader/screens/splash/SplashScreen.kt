@@ -85,7 +85,12 @@ private fun LaunchedEffectSplashScreen(
                 )
             )
             delay(800L)
-            navController.navigate(ReaderScreens.LoginScreen.name)
+            //navController.navigate(route = ReaderScreens.LoginScreen.name)
+            navController.navigate(route = ReaderScreens.LoginScreen.name) {
+                popUpTo(ReaderScreens.SplashScreen.name) {
+                    inclusive = true
+                }
+            }
         }
     )
 }
