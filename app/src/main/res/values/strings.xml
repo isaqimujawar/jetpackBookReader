@@ -1,3 +1,18 @@
 <resources>
     <string name="app_name">Jetpack Book Reader</string>
+    <string name="logo_title">Book Reader App</string>
+    <string name="logo_motto">\"Read. Change. Yourself\"</string>
+    <string name="back_arrow_icon">Back Arrow Icon</string>
+    <string name="show_password">Show password</string>
+    <string name="hide_password">Hide password</string>
+    <string name="email">Email</string>
+    <string name="enter_email">Enter email</string>
+    <string name="password">Password</string>
+    <string name="enter_password">Enter password</string>
+    <string name="login">Login</string>
+    <string name="new_user">New User?</string>
+    <string name="sign_up">Sign up</string>
+    <string name="create_account">Create Account</string>
+    <string name="already_a_user">Already a User?</string>
+    <string name="create_account_hint">Please enter a valid email and password that is at least 6 characters</string>
 </resources>
