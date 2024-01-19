@@ -122,7 +122,6 @@ fun CreateAccountScreen(
                     keyboardActions = KeyboardActions(
                         onDone = {
                             keyboardController?.hide()
-                            // TODO()
                         }
                     ),
                     singleLine = true,

@@ -118,7 +118,6 @@ fun LoginScreen(
                     keyboardActions = KeyboardActions(
                         onDone = {
                             keyboardController?.hide()
-                            // TODO()
                         }
                     ),
                     singleLine = true,
