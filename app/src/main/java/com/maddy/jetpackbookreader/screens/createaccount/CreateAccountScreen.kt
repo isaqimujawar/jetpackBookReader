@@ -77,63 +77,61 @@ fun CreateAccountScreen(navController: NavController) {
                 verticalArrangement = Arrangement.Top,
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
-                Column {
-                    Text(
-                        text = stringResource(id = R.string.create_account_hint),
-                        modifier = Modifier.padding(8.dp)
-                    )
-                    OutlinedTextField(
-                        value = email,
-                        onValueChange = { email = it },
-                        modifier = Modifier
-                            .padding(8.dp)
-                            .fillMaxWidth(),
-                        enabled = true,
-                        label = { Text(text = stringResource(id = R.string.email)) },
-                        placeholder = { Text(text = stringResource(id = R.string.enter_email)) },
-                        keyboardOptions = KeyboardOptions(
-                            keyboardType = KeyboardType.Email,
-                            imeAction = ImeAction.Next
-                        ),
-                        keyboardActions = KeyboardActions.Default,
-                        singleLine = true,
-                        maxLines = 1,
-                        shape = RoundedCornerShape(size = 15.dp),
-                    )
-                    OutlinedTextField(
-                        value = password,
-                        onValueChange = { password = it },
-                        modifier = Modifier
-                            .padding(8.dp)
-                            .fillMaxWidth(),
-                        enabled = true,
-                        label = { Text(text = stringResource(id = R.string.password)) },
-                        placeholder = { Text(text = stringResource(id = R.string.enter_password)) },
-                        trailingIcon = { ShowTrailingIcon(passwordHidden) },
-                        visualTransformation = visualTransformation,
-                        keyboardOptions = KeyboardOptions(
-                            keyboardType = KeyboardType.Password,
-                            imeAction = ImeAction.Done
-                        ),
-                        keyboardActions = KeyboardActions(
-                            onDone = {
-                                keyboardController?.hide()
-                                // TODO()
-                            }
-                        ),
-                        singleLine = true,
-                        maxLines = 1,
-                        shape = RoundedCornerShape(size = 15.dp),
-                    )
-                    Button(
-                        onClick = { /*TODO*/ },
-                        enabled = valid,
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(8.dp),
-                    ) {
-                        Text(text = stringResource(R.string.create_account))
-                    }
+                Text(
+                    text = stringResource(id = R.string.create_account_hint),
+                    modifier = Modifier.padding(8.dp)
+                )
+                OutlinedTextField(
+                    value = email,
+                    onValueChange = { email = it },
+                    modifier = Modifier
+                        .padding(8.dp)
+                        .fillMaxWidth(),
+                    enabled = true,
+                    label = { Text(text = stringResource(id = R.string.email)) },
+                    placeholder = { Text(text = stringResource(id = R.string.enter_email)) },
+                    keyboardOptions = KeyboardOptions(
+                        keyboardType = KeyboardType.Email,
+                        imeAction = ImeAction.Next
+                    ),
+                    keyboardActions = KeyboardActions.Default,
+                    singleLine = true,
+                    maxLines = 1,
+                    shape = RoundedCornerShape(size = 15.dp),
+                )
+                OutlinedTextField(
+                    value = password,
+                    onValueChange = { password = it },
+                    modifier = Modifier
+                        .padding(8.dp)
+                        .fillMaxWidth(),
+                    enabled = true,
+                    label = { Text(text = stringResource(id = R.string.password)) },
+                    placeholder = { Text(text = stringResource(id = R.string.enter_password)) },
+                    trailingIcon = { ShowTrailingIcon(passwordHidden) },
+                    visualTransformation = visualTransformation,
+                    keyboardOptions = KeyboardOptions(
+                        keyboardType = KeyboardType.Password,
+                        imeAction = ImeAction.Done
+                    ),
+                    keyboardActions = KeyboardActions(
+                        onDone = {
+                            keyboardController?.hide()
+                            // TODO()
+                        }
+                    ),
+                    singleLine = true,
+                    maxLines = 1,
+                    shape = RoundedCornerShape(size = 15.dp),
+                )
+                Button(
+                    onClick = { /*TODO*/ },
+                    enabled = valid,
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(8.dp),
+                ) {
+                    Text(text = stringResource(R.string.create_account))
                 }
                 Spacer(modifier = Modifier.height(50.dp))
                 Row(
