@@ -10,6 +10,7 @@ import com.google.firebase.auth.FirebaseUser
 import com.google.firebase.auth.ktx.auth
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.ktx.Firebase
+import com.maddy.jetpackbookreader.model.UserBookReader
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.launch
 import javax.inject.Inject
@@ -87,11 +88,19 @@ class LoginViewModel @Inject constructor() : ViewModel() {
     private fun createUser(user: FirebaseUser) {
         val userId = user.uid
         val displayName = user.email?.split('@')?.get(0).toString()
+        val email: String = user.email.toString()
 
-        // create a new user as a Map<String, Any>, because Firebase stores data as a HashMap.
-        val newUser = mutableMapOf<String, Any>()
-        newUser["user_id"] = userId
-        newUser["display_name"] = displayName
+        val newUser = UserBookReader(
+            userId = userId,
+            displayName = displayName,
+            email = email,
+            firstName = "",
+            lastName = "",
+            quote = "Life is great",
+            avatarUrl = "",
+            profession = "",
+            id = null
+        ).toMap()
 
         // Add new user to Firebase Firestore
         FirebaseFirestore.getInstance().collection("users").add(newUser)
