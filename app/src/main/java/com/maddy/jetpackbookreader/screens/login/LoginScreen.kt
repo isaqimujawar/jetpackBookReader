@@ -51,7 +51,10 @@ import com.maddy.jetpackbookreader.widgets.ReaderTopAppBar
 
 @OptIn(ExperimentalComposeUiApi::class)
 @Composable
-fun LoginScreen(navController: NavController, viewModel: LoginScreenViewModel = hiltViewModel()) {
+fun LoginScreen(
+    navController: NavController,
+    viewModel: LoginViewModel = hiltViewModel()
+) {
     val keyboardController = LocalSoftwareKeyboardController.current
     var email by rememberSaveable { mutableStateOf("") }
     var password by rememberSaveable { mutableStateOf("") }
@@ -124,6 +127,7 @@ fun LoginScreen(navController: NavController, viewModel: LoginScreenViewModel = 
                 )
                 Button(
                     onClick = {
+                        keyboardController?.hide()
                         viewModel.signInWithEmailAndPassword(email, password) {
                             navController.navigate(route = ReaderScreens.HomeScreen.name)
                         }

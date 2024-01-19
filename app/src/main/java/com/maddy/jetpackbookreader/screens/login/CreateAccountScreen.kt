@@ -1,4 +1,4 @@
-package com.maddy.jetpackbookreader.screens.createaccount
+package com.maddy.jetpackbookreader.screens.login
 
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -43,13 +43,18 @@ import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.unit.dp
+import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
 import com.maddy.jetpackbookreader.R
+import com.maddy.jetpackbookreader.navigation.ReaderScreens
 import com.maddy.jetpackbookreader.widgets.ReaderTopAppBar
 
 @OptIn(ExperimentalComposeUiApi::class)
 @Composable
-fun CreateAccountScreen(navController: NavController) {
+fun CreateAccountScreen(
+    navController: NavController,
+    viewModel: LoginViewModel = hiltViewModel()
+) {
     val keyboardController = LocalSoftwareKeyboardController.current
     var email by rememberSaveable { mutableStateOf("") }
     var password by rememberSaveable { mutableStateOf("") }
@@ -125,7 +130,12 @@ fun CreateAccountScreen(navController: NavController) {
                     shape = RoundedCornerShape(size = 15.dp),
                 )
                 Button(
-                    onClick = { /*TODO*/ },
+                    onClick = {
+                        keyboardController?.hide()
+                        viewModel.createUserWithEmailAndPassword(email, password) {
+                            navController.navigate(route = ReaderScreens.HomeScreen.name)
+                        }
+                    },
                     enabled = valid,
                     modifier = Modifier
                         .fillMaxWidth()
