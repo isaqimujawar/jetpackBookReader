@@ -18,4 +18,5 @@
     <string name="add_button">Add Button</string>
     <string name="logo_icon">Logo icon</string>
     <string name="logout_icon">Logout icon</string>
+    <string name="profile_icon">Profile Icon</string>
 </resources>

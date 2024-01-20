@@ -7,12 +7,13 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import com.maddy.jetpackbookreader.screens.details.BookDetailsScreen
 import com.maddy.jetpackbookreader.screens.home.HomeScreen
+import com.maddy.jetpackbookreader.screens.home.HomeViewModel
 import com.maddy.jetpackbookreader.screens.login.CreateAccountScreen
 import com.maddy.jetpackbookreader.screens.login.LoginScreen
 import com.maddy.jetpackbookreader.screens.login.LoginViewModel
 import com.maddy.jetpackbookreader.screens.search.SearchScreen
 import com.maddy.jetpackbookreader.screens.splash.SplashScreen
-import com.maddy.jetpackbookreader.screens.stats.ReaderStatsScreen
+import com.maddy.jetpackbookreader.screens.readerstats.ReaderStatsScreen
 import com.maddy.jetpackbookreader.screens.update.UpdateScreen
 
 @Composable
@@ -36,7 +37,8 @@ fun ReaderNavigation() {
             CreateAccountScreen(navController = navController, viewModel = loginViewModel)
         }
         composable(route = ReaderScreens.HomeScreen.name) {
-            HomeScreen(navController = navController)
+            val homeViewModel = hiltViewModel<HomeViewModel>()
+            HomeScreen(navController = navController, viewModel = homeViewModel)
         }
         composable(route = ReaderScreens.SearchScreen.name) {
             SearchScreen(navController = navController)

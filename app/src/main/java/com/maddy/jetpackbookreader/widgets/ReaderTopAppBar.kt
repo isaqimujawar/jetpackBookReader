@@ -21,7 +21,7 @@ fun ReaderTopAppBar(title: String = "Title") {
         title = {
             Text(
                 text = title,
-                color = MaterialTheme.colorScheme.onPrimaryContainer,
+                color = MaterialTheme.colorScheme.primary,
                 fontWeight = FontWeight.SemiBold,
                 maxLines = 1,
                 overflow = TextOverflow.Ellipsis,
