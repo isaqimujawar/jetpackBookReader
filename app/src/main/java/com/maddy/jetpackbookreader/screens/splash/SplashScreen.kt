@@ -26,6 +26,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
+import com.google.firebase.auth.FirebaseAuth
 import com.maddy.jetpackbookreader.R
 import com.maddy.jetpackbookreader.navigation.ReaderScreens
 import kotlinx.coroutines.delay
@@ -86,9 +87,17 @@ private fun LaunchedEffectSplashScreen(
             )
             delay(800L)
             //navController.navigate(route = ReaderScreens.LoginScreen.name)
-            navController.navigate(route = ReaderScreens.LoginScreen.name) {
-                popUpTo(ReaderScreens.SplashScreen.name) {
-                    inclusive = true
+            if (FirebaseAuth.getInstance().currentUser?.email.isNullOrEmpty()) {
+                navController.navigate(route = ReaderScreens.LoginScreen.name) {
+                    popUpTo(ReaderScreens.SplashScreen.name) {
+                        inclusive = true
+                    }
+                }
+            } else {
+                navController.navigate(route = ReaderScreens.HomeScreen.name) {
+                    popUpTo(ReaderScreens.SplashScreen.name) {
+                        inclusive = true
+                    }
                 }
             }
         }

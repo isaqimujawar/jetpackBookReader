@@ -1,4 +1,4 @@
-package com.maddy.jetpackbookreader.screens.createaccount
+package com.maddy.jetpackbookreader.screens.login
 
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -43,13 +43,18 @@ import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.unit.dp
+import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
 import com.maddy.jetpackbookreader.R
+import com.maddy.jetpackbookreader.navigation.ReaderScreens
 import com.maddy.jetpackbookreader.widgets.ReaderTopAppBar
 
 @OptIn(ExperimentalComposeUiApi::class)
 @Composable
-fun CreateAccountScreen(navController: NavController) {
+fun CreateAccountScreen(
+    navController: NavController,
+    viewModel: LoginViewModel = hiltViewModel()
+) {
     val keyboardController = LocalSoftwareKeyboardController.current
     var email by rememberSaveable { mutableStateOf("") }
     var password by rememberSaveable { mutableStateOf("") }
@@ -77,63 +82,65 @@ fun CreateAccountScreen(navController: NavController) {
                 verticalArrangement = Arrangement.Top,
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
-                Column {
-                    Text(
-                        text = stringResource(id = R.string.create_account_hint),
-                        modifier = Modifier.padding(8.dp)
-                    )
-                    OutlinedTextField(
-                        value = email,
-                        onValueChange = { email = it },
-                        modifier = Modifier
-                            .padding(8.dp)
-                            .fillMaxWidth(),
-                        enabled = true,
-                        label = { Text(text = stringResource(id = R.string.email)) },
-                        placeholder = { Text(text = stringResource(id = R.string.enter_email)) },
-                        keyboardOptions = KeyboardOptions(
-                            keyboardType = KeyboardType.Email,
-                            imeAction = ImeAction.Next
-                        ),
-                        keyboardActions = KeyboardActions.Default,
-                        singleLine = true,
-                        maxLines = 1,
-                        shape = RoundedCornerShape(size = 15.dp),
-                    )
-                    OutlinedTextField(
-                        value = password,
-                        onValueChange = { password = it },
-                        modifier = Modifier
-                            .padding(8.dp)
-                            .fillMaxWidth(),
-                        enabled = true,
-                        label = { Text(text = stringResource(id = R.string.password)) },
-                        placeholder = { Text(text = stringResource(id = R.string.enter_password)) },
-                        trailingIcon = { ShowTrailingIcon(passwordHidden) },
-                        visualTransformation = visualTransformation,
-                        keyboardOptions = KeyboardOptions(
-                            keyboardType = KeyboardType.Password,
-                            imeAction = ImeAction.Done
-                        ),
-                        keyboardActions = KeyboardActions(
-                            onDone = {
-                                keyboardController?.hide()
-                                // TODO()
-                            }
-                        ),
-                        singleLine = true,
-                        maxLines = 1,
-                        shape = RoundedCornerShape(size = 15.dp),
-                    )
-                    Button(
-                        onClick = { /*TODO*/ },
-                        enabled = valid,
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(8.dp),
-                    ) {
-                        Text(text = stringResource(R.string.create_account))
-                    }
+                Text(
+                    text = stringResource(id = R.string.create_account_hint),
+                    modifier = Modifier.padding(8.dp)
+                )
+                OutlinedTextField(
+                    value = email,
+                    onValueChange = { email = it },
+                    modifier = Modifier
+                        .padding(8.dp)
+                        .fillMaxWidth(),
+                    enabled = true,
+                    label = { Text(text = stringResource(id = R.string.email)) },
+                    placeholder = { Text(text = stringResource(id = R.string.enter_email)) },
+                    keyboardOptions = KeyboardOptions(
+                        keyboardType = KeyboardType.Email,
+                        imeAction = ImeAction.Next
+                    ),
+                    keyboardActions = KeyboardActions.Default,
+                    singleLine = true,
+                    maxLines = 1,
+                    shape = RoundedCornerShape(size = 15.dp),
+                )
+                OutlinedTextField(
+                    value = password,
+                    onValueChange = { password = it },
+                    modifier = Modifier
+                        .padding(8.dp)
+                        .fillMaxWidth(),
+                    enabled = true,
+                    label = { Text(text = stringResource(id = R.string.password)) },
+                    placeholder = { Text(text = stringResource(id = R.string.enter_password)) },
+                    trailingIcon = { ShowTrailingIcon(passwordHidden) },
+                    visualTransformation = visualTransformation,
+                    keyboardOptions = KeyboardOptions(
+                        keyboardType = KeyboardType.Password,
+                        imeAction = ImeAction.Done
+                    ),
+                    keyboardActions = KeyboardActions(
+                        onDone = {
+                            keyboardController?.hide()
+                        }
+                    ),
+                    singleLine = true,
+                    maxLines = 1,
+                    shape = RoundedCornerShape(size = 15.dp),
+                )
+                Button(
+                    onClick = {
+                        keyboardController?.hide()
+                        viewModel.createUserWithEmailAndPassword(email, password) {
+                            navController.navigate(route = ReaderScreens.HomeScreen.name)
+                        }
+                    },
+                    enabled = valid,
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(8.dp),
+                ) {
+                    Text(text = stringResource(R.string.create_account))
                 }
                 Spacer(modifier = Modifier.height(50.dp))
                 Row(
