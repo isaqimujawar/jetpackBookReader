@@ -15,4 +15,7 @@
     <string name="create_account">Create Account</string>
     <string name="already_a_user">Already a User?</string>
     <string name="create_account_hint">Please enter a valid email and password that is at least 6 characters</string>
+    <string name="add_button">Add Button</string>
+    <string name="logo_icon">Logo icon</string>
+    <string name="logout_icon">Logout icon</string>
 </resources>

@@ -67,7 +67,7 @@ fun LoginScreen(
 
     Scaffold(
         topBar = {
-            ReaderTopAppBar(title = stringResource(R.string.logo_title)) { navController.popBackStack() }
+            ReaderTopAppBar(title = stringResource(R.string.logo_title))
         }
     ) { paddingValues ->
         Surface(
@@ -128,7 +128,11 @@ fun LoginScreen(
                     onClick = {
                         keyboardController?.hide()
                         viewModel.signInWithEmailAndPassword(email, password) {
-                            navController.navigate(route = ReaderScreens.HomeScreen.name)
+                            navController.navigate(route = ReaderScreens.HomeScreen.name) {
+                                popUpTo(navController.graph.id) {
+                                    inclusive = true
+                                }
+                            }
                         }
                     },
                     enabled = valid,

@@ -67,7 +67,7 @@ fun CreateAccountScreen(
 
     Scaffold(
         topBar = {
-            ReaderTopAppBar(title = stringResource(R.string.logo_title)) { navController.popBackStack() }
+            ReaderTopAppBar(title = stringResource(R.string.logo_title))
         }
     ) { paddingValues ->
         Surface(
