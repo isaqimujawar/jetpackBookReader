@@ -19,4 +19,7 @@
     <string name="logo_icon">Logo icon</string>
     <string name="logout_icon">Logout icon</string>
     <string name="profile_icon">Profile Icon</string>
+    <string name="favorite_icon">favorite icon</string>
+    <string name="book_image">book image</string>
+    <string name="star_icon">Star icon</string>
 </resources>
