@@ -70,7 +70,7 @@ fun HomeScreen(
 
     Scaffold(
         topBar = { HomeTopAppBar(navController) },
-        floatingActionButton = { FABAddBook() },
+        floatingActionButton = { FABAddBook(navController) },
     ) { paddingValues ->
         Surface(
             modifier = Modifier
@@ -83,17 +83,17 @@ fun HomeScreen(
 }
 
 @Composable
-private fun FABAddBook() {
+private fun FABAddBook(navController: NavController) {
     FloatingActionButton(
-        onClick = { /*TODO*/ },
+        onClick = { navController.navigate(route = ReaderScreens.SearchScreen.name) },
         modifier = Modifier,
         shape = RoundedCornerShape(50.dp),
-        containerColor = MaterialTheme.colorScheme.background
+        containerColor = MaterialTheme.colorScheme.primary
     ) {
         Icon(
             imageVector = Icons.Default.Add,
             contentDescription = stringResource(R.string.add_button),
-            tint = MaterialTheme.colorScheme.onBackground
+            tint = MaterialTheme.colorScheme.onPrimary
         )
     }
 }
@@ -292,36 +292,41 @@ fun ReadingList(listOfBooks: List<ReadingBook>, navController: NavController) {
 @Composable
 @OptIn(ExperimentalMaterial3Api::class)
 private fun HomeTopAppBar(navController: NavController, modifier: Modifier = Modifier) {
-    CenterAlignedTopAppBar(title = {
-        Text(
-            text = "Book Reader",
-            style = MaterialTheme.typography.titleLarge,
-            color = MaterialTheme.colorScheme.primary,
-            fontWeight = FontWeight.SemiBold,
-        )
-    }, modifier = modifier
-        .padding(bottom = 2.dp)
-        .shadow(elevation = 0.dp), navigationIcon = {
-        Icon(
-            imageVector = Icons.Default.Menu,
-            contentDescription = stringResource(R.string.logo_icon)
-        )
-    }, actions = {
-        IconButton(onClick = {
-            FirebaseAuth.getInstance().signOut().run {
-                navController.navigate(route = ReaderScreens.LoginScreen.name) {
-                    popUpTo(navController.graph.id) {
-                        inclusive = true
+    CenterAlignedTopAppBar(
+        title = {
+            Text(
+                text = "Book Reader",
+                style = MaterialTheme.typography.titleLarge,
+                color = MaterialTheme.colorScheme.primary,
+                fontWeight = FontWeight.SemiBold,
+            )
+        },
+        modifier = modifier
+            .padding(bottom = 2.dp)
+            .shadow(elevation = 0.dp),
+        navigationIcon = {
+            Icon(
+                imageVector = Icons.Default.Menu,
+                contentDescription = stringResource(R.string.logo_icon)
+            )
+        },
+        actions = {
+            IconButton(onClick = {
+                FirebaseAuth.getInstance().signOut().run {
+                    navController.navigate(route = ReaderScreens.LoginScreen.name) {
+                        popUpTo(navController.graph.id) {
+                            inclusive = true
+                        }
                     }
                 }
+            }) {
+                Icon(
+                    painter = painterResource(id = R.drawable.logout_icon),
+                    contentDescription = stringResource(R.string.logout_icon)
+                )
             }
-        }) {
-            Icon(
-                painter = painterResource(id = R.drawable.logout_icon),
-                contentDescription = stringResource(R.string.logout_icon)
-            )
-        }
-    }, colors = TopAppBarDefaults.topAppBarColors(containerColor = Color.Transparent)
+        },
+        colors = TopAppBarDefaults.topAppBarColors(containerColor = Color.Transparent)
     )
 }
 
