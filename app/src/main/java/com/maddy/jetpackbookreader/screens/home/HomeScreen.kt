@@ -22,28 +22,21 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.AccountCircle
 import androidx.compose.material.icons.filled.Add
-import androidx.compose.material.icons.filled.Menu
 import androidx.compose.material.icons.rounded.FavoriteBorder
 import androidx.compose.material.icons.rounded.Star
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
-import androidx.compose.material3.CenterAlignedTopAppBar
 import androidx.compose.material3.Divider
-import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
-import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.draw.shadow
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
@@ -54,13 +47,13 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
-import com.google.firebase.auth.FirebaseAuth
 import com.maddy.jetpackbookreader.R
 import com.maddy.jetpackbookreader.components.TitleText
 import com.maddy.jetpackbookreader.model.ReadingBook
 import com.maddy.jetpackbookreader.navigation.ReaderScreens
 import com.maddy.jetpackbookreader.ui.theme.JetpackBookReaderTheme
 import com.maddy.jetpackbookreader.utils.getBook
+import com.maddy.jetpackbookreader.widgets.HomeTopAppBar
 
 @Composable
 fun HomeScreen(
@@ -69,8 +62,22 @@ fun HomeScreen(
     val displayName = viewModel.getUserDisplayName()
 
     Scaffold(
-        topBar = { HomeTopAppBar(navController) },
-        floatingActionButton = { FABAddBook(navController) },
+        topBar = {
+            HomeTopAppBar {
+                viewModel.signOut().run {
+                    navController.navigate(route = ReaderScreens.LoginScreen.name) {
+                        popUpTo(navController.graph.id) {
+                            inclusive = true
+                        }
+                    }
+                }
+            }
+        },
+        floatingActionButton = {
+            FABAddBook {
+                navController.navigate(route = ReaderScreens.SearchScreen.name)
+            }
+        },
     ) { paddingValues ->
         Surface(
             modifier = Modifier
@@ -83,9 +90,9 @@ fun HomeScreen(
 }
 
 @Composable
-private fun FABAddBook(navController: NavController) {
+private fun FABAddBook(onFABClicked: () -> Unit) {
     FloatingActionButton(
-        onClick = { navController.navigate(route = ReaderScreens.SearchScreen.name) },
+        onClick = { onFABClicked() },
         modifier = Modifier,
         shape = RoundedCornerShape(50.dp),
         containerColor = MaterialTheme.colorScheme.primary
@@ -100,7 +107,9 @@ private fun FABAddBook(navController: NavController) {
 
 @Composable
 fun HomeContent(
-    navController: NavController, modifier: Modifier = Modifier, displayName: String
+    navController: NavController,
+    modifier: Modifier = Modifier,
+    displayName: String
 ) {
     Column(
         modifier = modifier
@@ -108,24 +117,23 @@ fun HomeContent(
             .fillMaxSize()
             .verticalScroll(rememberScrollState())
     ) {
-        TitleSection(modifier, navController, displayName)
-        BooKCard(book = getBook()) {
+        TitleSection(modifier, displayName) {
+            navController.navigate(route = ReaderScreens.ReaderStatsScreen.name)
+        }
+        BookCard(book = getBook()) {
             // Todo("Card OnClick impl")
         }
         Spacer(modifier = Modifier.height(12.dp))
         TitleText("Reading List")
-        ReadingList(
-            listOfBooks = listOf(getBook(), getBook(), getBook()),
-            navController = navController
-        )
+        ReadingList(listOfBooks = listOf(getBook(), getBook(), getBook()))
     }
 }
 
 @Composable
 private fun TitleSection(
     modifier: Modifier,
-    navController: NavController,
-    displayName: String
+    displayName: String,
+    onProfileClicked: () -> Unit
 ) {
     Row(
         modifier = modifier.fillMaxWidth(),
@@ -134,9 +142,8 @@ private fun TitleSection(
     ) {
         TitleText("My Reading Activity")
         Column(
-            modifier = Modifier.clickable {
-                navController.navigate(route = ReaderScreens.ReaderStatsScreen.name)
-            }, horizontalAlignment = Alignment.CenterHorizontally
+            modifier = Modifier.clickable { onProfileClicked() },
+            horizontalAlignment = Alignment.CenterHorizontally
         ) {
             Icon(
                 imageVector = Icons.Default.AccountCircle,
@@ -158,7 +165,7 @@ private fun TitleSection(
 }
 
 @Composable
-fun BooKCard(book: ReadingBook, onClick: (String?) -> Unit = {}) {
+fun BookCard(book: ReadingBook, onClick: (String?) -> Unit = {}) {
     Card(
         modifier = Modifier
             .padding(12.dp)
@@ -279,59 +286,18 @@ private fun ReadingSurface(text: String) {
 }
 
 @Composable
-fun ReadingList(listOfBooks: List<ReadingBook>, navController: NavController) {
+fun ReadingList(listOfBooks: List<ReadingBook>) {
     LazyRow {
         items(items = listOfBooks) {
-            BooKCard(book = it) {
+            BookCard(book = it) {
                 // TODO("Card OnClick impl")
             }
         }
     }
 }
 
-@Composable
-@OptIn(ExperimentalMaterial3Api::class)
-private fun HomeTopAppBar(navController: NavController, modifier: Modifier = Modifier) {
-    CenterAlignedTopAppBar(
-        title = {
-            Text(
-                text = "Book Reader",
-                style = MaterialTheme.typography.titleLarge,
-                color = MaterialTheme.colorScheme.primary,
-                fontWeight = FontWeight.SemiBold,
-            )
-        },
-        modifier = modifier
-            .padding(bottom = 2.dp)
-            .shadow(elevation = 0.dp),
-        navigationIcon = {
-            Icon(
-                imageVector = Icons.Default.Menu,
-                contentDescription = stringResource(R.string.logo_icon)
-            )
-        },
-        actions = {
-            IconButton(onClick = {
-                FirebaseAuth.getInstance().signOut().run {
-                    navController.navigate(route = ReaderScreens.LoginScreen.name) {
-                        popUpTo(navController.graph.id) {
-                            inclusive = true
-                        }
-                    }
-                }
-            }) {
-                Icon(
-                    painter = painterResource(id = R.drawable.logout_icon),
-                    contentDescription = stringResource(R.string.logout_icon)
-                )
-            }
-        },
-        colors = TopAppBarDefaults.topAppBarColors(containerColor = Color.Transparent)
-    )
-}
-
 @Preview(showSystemUi = true)
 @Composable
 fun BookCardPreview() {
-    JetpackBookReaderTheme { BooKCard(getBook()) }
+    JetpackBookReaderTheme { BookCard(getBook()) }
 }

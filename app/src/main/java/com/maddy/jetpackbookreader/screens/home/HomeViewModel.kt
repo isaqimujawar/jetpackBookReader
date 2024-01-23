@@ -14,4 +14,8 @@ class HomeViewModel @Inject constructor() : ViewModel() {
     fun getUserDisplayName(): String {
         return if (displayName == "null") "name" else displayName
     }
+
+    fun signOut() {
+        FirebaseAuth.getInstance().signOut()
+    }
 }
