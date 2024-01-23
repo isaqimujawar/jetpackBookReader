@@ -44,7 +44,7 @@ private fun ReaderApp() {
 
 @Preview(showBackground = true)
 @Composable
-fun GreetingPreview() {
+fun MainActivityPreview() {
     JetpackBookReaderTheme {
         ReaderApp()
     }

@@ -89,13 +89,19 @@ private fun LaunchedEffectSplashScreen(
             //navController.navigate(route = ReaderScreens.LoginScreen.name)
             if (FirebaseAuth.getInstance().currentUser?.email.isNullOrEmpty()) {
                 navController.navigate(route = ReaderScreens.LoginScreen.name) {
-                    popUpTo(ReaderScreens.SplashScreen.name) {
+                    /*popUpTo(ReaderScreens.SplashScreen.name) {
+                        inclusive = true
+                    }*/
+                    popUpTo(navController.graph.id) {
                         inclusive = true
                     }
                 }
             } else {
                 navController.navigate(route = ReaderScreens.HomeScreen.name) {
-                    popUpTo(ReaderScreens.SplashScreen.name) {
+                    /*popUpTo(ReaderScreens.SplashScreen.name) {
+                        inclusive = true
+                    }*/
+                    popUpTo(navController.graph.id) {
                         inclusive = true
                     }
                 }

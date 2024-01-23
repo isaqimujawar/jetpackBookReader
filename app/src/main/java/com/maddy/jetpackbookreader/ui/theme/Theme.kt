@@ -15,7 +15,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalView
 import androidx.core.view.WindowCompat
 
-private val DarkColorScheme = darkColorScheme(
+/*private val DarkColorScheme = darkColorScheme(
     primary = Purple80,
     secondary = PurpleGrey80,
     tertiary = Pink80
@@ -25,16 +25,65 @@ private val LightColorScheme = lightColorScheme(
     primary = Purple40,
     secondary = PurpleGrey40,
     tertiary = Pink40
+)*/
 
-    /* Other default colors to override
-    background = Color(0xFFFFFBFE),
-    surface = Color(0xFFFFFBFE),
-    onPrimary = Color.White,
-    onSecondary = Color.White,
-    onTertiary = Color.White,
-    onBackground = Color(0xFF1C1B1F),
-    onSurface = Color(0xFF1C1B1F),
-    */
+// Material 3 color schemes - using color scheme from material3 sample app "Reply"
+private val replyDarkColorScheme = darkColorScheme(
+    primary = replyDarkPrimary,
+    onPrimary = replyDarkOnPrimary,
+    primaryContainer = replyDarkPrimaryContainer,
+    onPrimaryContainer = replyDarkOnPrimaryContainer,
+    inversePrimary = replyDarkPrimaryInverse,
+    secondary = replyDarkSecondary,
+    onSecondary = replyDarkOnSecondary,
+    secondaryContainer = replyDarkSecondaryContainer,
+    onSecondaryContainer = replyDarkOnSecondaryContainer,
+    tertiary = replyDarkTertiary,
+    onTertiary = replyDarkOnTertiary,
+    tertiaryContainer = replyDarkTertiaryContainer,
+    onTertiaryContainer = replyDarkOnTertiaryContainer,
+    error = replyDarkError,
+    onError = replyDarkOnError,
+    errorContainer = replyDarkErrorContainer,
+    onErrorContainer = replyDarkOnErrorContainer,
+    background = replyDarkBackground,
+    onBackground = replyDarkOnBackground,
+    surface = replyDarkSurface,
+    onSurface = replyDarkOnSurface,
+    inverseSurface = replyDarkInverseSurface,
+    inverseOnSurface = replyDarkInverseOnSurface,
+    surfaceVariant = replyDarkSurfaceVariant,
+    onSurfaceVariant = replyDarkOnSurfaceVariant,
+    outline = replyDarkOutline
+)
+
+private val replyLightColorScheme = lightColorScheme(
+    primary = replyLightPrimary,
+    onPrimary = replyLightOnPrimary,
+    primaryContainer = replyLightPrimaryContainer,
+    onPrimaryContainer = replyLightOnPrimaryContainer,
+    inversePrimary = replyLightPrimaryInverse,
+    secondary = replyLightSecondary,
+    onSecondary = replyLightOnSecondary,
+    secondaryContainer = replyLightSecondaryContainer,
+    onSecondaryContainer = replyLightOnSecondaryContainer,
+    tertiary = replyLightTertiary,
+    onTertiary = replyLightOnTertiary,
+    tertiaryContainer = replyLightTertiaryContainer,
+    onTertiaryContainer = replyLightOnTertiaryContainer,
+    error = replyLightError,
+    onError = replyLightOnError,
+    errorContainer = replyLightErrorContainer,
+    onErrorContainer = replyLightOnErrorContainer,
+    background = replyLightBackground,
+    onBackground = replyLightOnBackground,
+    surface = replyLightSurface,
+    onSurface = replyLightOnSurface,
+    inverseSurface = replyLightInverseSurface,
+    inverseOnSurface = replyLightInverseOnSurface,
+    surfaceVariant = replyLightSurfaceVariant,
+    onSurfaceVariant = replyLightOnSurfaceVariant,
+    outline = replyLightOutline
 )
 
 @Composable
@@ -50,8 +99,8 @@ fun JetpackBookReaderTheme(
             if (darkTheme) dynamicDarkColorScheme(context) else dynamicLightColorScheme(context)
         }
 
-        darkTheme -> DarkColorScheme
-        else -> LightColorScheme
+        darkTheme -> replyDarkColorScheme
+        else -> replyLightColorScheme
     }
     val view = LocalView.current
     if (!view.isInEditMode) {
