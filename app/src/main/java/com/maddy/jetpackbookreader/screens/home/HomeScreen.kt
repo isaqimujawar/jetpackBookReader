@@ -5,6 +5,7 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -13,6 +14,8 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.wrapContentHeight
+import androidx.compose.foundation.lazy.LazyRow
+import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
@@ -53,6 +56,7 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
 import com.google.firebase.auth.FirebaseAuth
 import com.maddy.jetpackbookreader.R
+import com.maddy.jetpackbookreader.components.TitleText
 import com.maddy.jetpackbookreader.model.ReadingBook
 import com.maddy.jetpackbookreader.navigation.ReaderScreens
 import com.maddy.jetpackbookreader.ui.theme.JetpackBookReaderTheme
@@ -66,20 +70,7 @@ fun HomeScreen(
 
     Scaffold(
         topBar = { HomeTopAppBar(navController) },
-        floatingActionButton = {
-            FloatingActionButton(
-                onClick = { /*TODO*/ },
-                modifier = Modifier,
-                shape = RoundedCornerShape(50.dp),
-                containerColor = MaterialTheme.colorScheme.background
-            ) {
-                Icon(
-                    imageVector = Icons.Default.Add,
-                    contentDescription = stringResource(R.string.add_button),
-                    tint = MaterialTheme.colorScheme.onBackground
-                )
-            }
-        },
+        floatingActionButton = { FABAddBook() },
     ) { paddingValues ->
         Surface(
             modifier = Modifier
@@ -88,6 +79,22 @@ fun HomeScreen(
         ) {
             HomeContent(navController, displayName = displayName)
         }
+    }
+}
+
+@Composable
+private fun FABAddBook() {
+    FloatingActionButton(
+        onClick = { /*TODO*/ },
+        modifier = Modifier,
+        shape = RoundedCornerShape(50.dp),
+        containerColor = MaterialTheme.colorScheme.background
+    ) {
+        Icon(
+            imageVector = Icons.Default.Add,
+            contentDescription = stringResource(R.string.add_button),
+            tint = MaterialTheme.colorScheme.onBackground
+        )
     }
 }
 
@@ -101,157 +108,183 @@ fun HomeContent(
             .fillMaxSize()
             .verticalScroll(rememberScrollState())
     ) {
-        Row(
-            modifier = modifier.fillMaxWidth(),
-            horizontalArrangement = Arrangement.SpaceBetween,
-            verticalAlignment = Alignment.CenterVertically
-        ) {
-            Text(
-                text = "My Reading Activity",
-                style = MaterialTheme.typography.headlineSmall,
-                color = MaterialTheme.colorScheme.primary
-            )
-            Column(
-                modifier = Modifier.clickable {
-                    navController.navigate(route = ReaderScreens.ReaderStatsScreen.name)
-                }, horizontalAlignment = Alignment.CenterHorizontally
-            ) {
-                Icon(
-                    imageVector = Icons.Default.AccountCircle,
-                    contentDescription = stringResource(R.string.profile_icon),
-                    modifier = Modifier.size(50.dp),
-                    tint = MaterialTheme.colorScheme.primary,
-                )
-                Text(
-                    text = displayName,
-                    modifier = Modifier.width(60.dp),
-                    style = MaterialTheme.typography.labelMedium,
-                    color = MaterialTheme.colorScheme.primary,
-                    maxLines = 1,
-                    overflow = TextOverflow.Clip
-                )
-                Divider(modifier = Modifier.width(60.dp))
-            }
+        TitleSection(modifier, navController, displayName)
+        BooKCard(book = getBook()) {
+            // Todo("Card OnClick impl")
         }
-        BooKCard(book = getBook())
+        Spacer(modifier = Modifier.height(12.dp))
+        TitleText("Reading List")
+        ReadingList(
+            listOfBooks = listOf(getBook(), getBook(), getBook()),
+            navController = navController
+        )
     }
 }
 
 @Composable
-fun BooKCard(book: ReadingBook, onClick: (String) -> Unit = {}) {
+private fun TitleSection(
+    modifier: Modifier,
+    navController: NavController,
+    displayName: String
+) {
+    Row(
+        modifier = modifier.fillMaxWidth(),
+        horizontalArrangement = Arrangement.SpaceBetween,
+        verticalAlignment = Alignment.CenterVertically
+    ) {
+        TitleText("My Reading Activity")
+        Column(
+            modifier = Modifier.clickable {
+                navController.navigate(route = ReaderScreens.ReaderStatsScreen.name)
+            }, horizontalAlignment = Alignment.CenterHorizontally
+        ) {
+            Icon(
+                imageVector = Icons.Default.AccountCircle,
+                contentDescription = stringResource(R.string.profile_icon),
+                modifier = Modifier.size(50.dp),
+                tint = MaterialTheme.colorScheme.primary,
+            )
+            Text(
+                text = displayName,
+                modifier = Modifier.width(60.dp),
+                style = MaterialTheme.typography.labelMedium,
+                color = MaterialTheme.colorScheme.primary,
+                maxLines = 1,
+                overflow = TextOverflow.Clip
+            )
+            Divider(modifier = Modifier.width(60.dp))
+        }
+    }
+}
+
+@Composable
+fun BooKCard(book: ReadingBook, onClick: (String?) -> Unit = {}) {
     Card(
         modifier = Modifier
             .padding(12.dp)
-            .fillMaxWidth(0.9f)
+            .width(260.dp)
             .wrapContentHeight()
-            .clickable { onClick(book.id ?: "0") },
+            .clickable { onClick(book.id) },
         shape = RoundedCornerShape(29.dp),
         elevation = CardDefaults.cardElevation(6.dp),
     ) {
         Column {
-            BookImageAndRating()
-            BookTitleAndAuthor()
-            ReadingSurface()
+            BookImageAndRating(imageUrl = "", rating = 4.5.toString())
+            BookTitleAndAuthor(book.title, book.author)
+            ReadingSurface("Reading")
         }
     }
 }
 
 @Composable
-private fun BookImageAndRating() {
+private fun BookImageAndRating(imageUrl: String, rating: String) {
     Row(
         modifier = Modifier
             .fillMaxWidth()
             .height(200.dp),
-        horizontalArrangement = Arrangement.Start,
-        verticalAlignment = Alignment.Top
+        horizontalArrangement = Arrangement.SpaceBetween,
+        verticalAlignment = Alignment.CenterVertically
     ) {
         Image(
             painter = painterResource(id = R.drawable.books_unsplash),
-            contentDescription = stringResource(R.string.book_image),
             modifier = Modifier
-                .fillMaxWidth(fraction = 0.8f)
+                .width(200.dp)
                 .fillMaxHeight(),
+            contentDescription = stringResource(R.string.book_image),
             contentScale = ContentScale.Crop
         )
-        Column(
-            modifier = Modifier.fillMaxSize(),
-            verticalArrangement = Arrangement.SpaceEvenly,
-            horizontalAlignment = Alignment.CenterHorizontally
+        BookRating(rating)
+    }
+}
+
+@Composable
+fun BookRating(rating: String = "4.0") {
+    Column(
+        modifier = Modifier.padding(end = 8.dp),
+        verticalArrangement = Arrangement.Center,
+        horizontalAlignment = Alignment.CenterHorizontally
+    ) {
+        Icon(
+            imageVector = Icons.Rounded.FavoriteBorder,
+            contentDescription = stringResource(R.string.favorite_icon),
+            modifier = Modifier.padding(top = 2.dp)
+        )
+        Spacer(modifier = Modifier.height(16.dp))
+        Surface(
+            shape = RoundedCornerShape(56.dp),
+            shadowElevation = 6.dp
         ) {
-            Icon(
-                imageVector = Icons.Rounded.FavoriteBorder,
-                contentDescription = stringResource(R.string.favorite_icon),
-                modifier = Modifier.padding(1.dp)
-            )
-            BookRating(4.5)
+            Column(
+                modifier = Modifier.padding(2.dp),
+                verticalArrangement = Arrangement.Center,
+                horizontalAlignment = Alignment.CenterHorizontally
+            ) {
+                Icon(
+                    imageVector = Icons.Rounded.Star,
+                    contentDescription = stringResource(R.string.star_icon)
+                )
+                Text(
+                    text = rating, style = MaterialTheme.typography.headlineSmall
+                )
+            }
         }
     }
 }
 
 @Composable
-private fun ReadingSurface() {
+private fun BookTitleAndAuthor(title: String?, author: String?) {
+    Column(
+        modifier = Modifier
+            .padding(4.dp)
+            .fillMaxWidth()
+    ) {
+        Text(
+            text = title ?: "Book Title",
+            style = MaterialTheme.typography.headlineMedium,
+            fontWeight = FontWeight.SemiBold,
+            maxLines = 1,
+            overflow = TextOverflow.Ellipsis
+        )
+        Text(
+            text = author ?: "Author",
+            style = MaterialTheme.typography.labelLarge,
+            maxLines = 1,
+            overflow = TextOverflow.Ellipsis
+        )
+    }
+}
+
+@Composable
+private fun ReadingSurface(text: String) {
     Row(
         modifier = Modifier.fillMaxWidth(),
         horizontalArrangement = Arrangement.End,
         verticalAlignment = Alignment.CenterVertically
     ) {
         Surface(
-            Modifier.clip(RoundedCornerShape(topStartPercent = 29, bottomEndPercent = 29)),
+            Modifier
+                .clip(RoundedCornerShape(topStartPercent = 29, bottomEndPercent = 29)),
             color = MaterialTheme.colorScheme.primary
         ) {
-            Column(
-                verticalArrangement = Arrangement.Center,
-                horizontalAlignment = Alignment.CenterHorizontally
-            ) {
-                Text(
-                    text = "Reading",
-                    modifier = Modifier.padding(8.dp),
-                    style = MaterialTheme.typography.titleMedium,
-                    color = MaterialTheme.colorScheme.onPrimary,
-                    fontStyle = FontStyle.Italic,
-                    fontWeight = FontWeight.SemiBold
-                )
-            }
+            Text(
+                text = text,
+                modifier = Modifier.padding(8.dp),
+                style = MaterialTheme.typography.titleMedium,
+                color = MaterialTheme.colorScheme.onPrimary,
+                fontStyle = FontStyle.Italic,
+                fontWeight = FontWeight.SemiBold
+            )
         }
     }
 }
 
 @Composable
-private fun BookTitleAndAuthor() {
-    Text(
-        text = "Book Title",
-        modifier = Modifier.padding(4.dp),
-        style = MaterialTheme.typography.headlineMedium,
-        fontWeight = FontWeight.SemiBold,
-        maxLines = 1,
-        overflow = TextOverflow.Ellipsis
-    )
-    Text(
-        text = "Author",
-        modifier = Modifier.padding(start = 8.dp),
-        style = MaterialTheme.typography.labelLarge,
-        maxLines = 1,
-        overflow = TextOverflow.Ellipsis
-    )
-}
-
-@Composable
-fun BookRating(rating: Double = 4.0) {
-    Surface(
-        shape = RoundedCornerShape(56.dp), shadowElevation = 6.dp
-    ) {
-        Column(
-            modifier = Modifier.padding(2.dp),
-            verticalArrangement = Arrangement.Center,
-            horizontalAlignment = Alignment.CenterHorizontally
-        ) {
-            Icon(
-                imageVector = Icons.Rounded.Star,
-                contentDescription = stringResource(R.string.star_icon)
-            )
-            Text(
-                text = rating.toString(), style = MaterialTheme.typography.headlineSmall
-            )
+fun ReadingList(listOfBooks: List<ReadingBook>, navController: NavController) {
+    LazyRow {
+        items(items = listOfBooks) {
+            BooKCard(book = it) {
+                // TODO("Card OnClick impl")
+            }
         }
     }
 }
@@ -267,7 +300,7 @@ private fun HomeTopAppBar(navController: NavController, modifier: Modifier = Mod
             fontWeight = FontWeight.SemiBold,
         )
     }, modifier = modifier
-        .padding(8.dp)
+        .padding(bottom = 2.dp)
         .shadow(elevation = 0.dp), navigationIcon = {
         Icon(
             imageVector = Icons.Default.Menu,
@@ -295,6 +328,5 @@ private fun HomeTopAppBar(navController: NavController, modifier: Modifier = Mod
 @Preview(showSystemUi = true)
 @Composable
 fun BookCardPreview() {
-
     JetpackBookReaderTheme { BooKCard(getBook()) }
 }
