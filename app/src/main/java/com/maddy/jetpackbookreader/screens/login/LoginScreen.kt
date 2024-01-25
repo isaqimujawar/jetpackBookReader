@@ -47,7 +47,7 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
 import com.maddy.jetpackbookreader.R
 import com.maddy.jetpackbookreader.navigation.ReaderScreens
-import com.maddy.jetpackbookreader.widgets.ReaderTopAppBar
+import com.maddy.jetpackbookreader.widgets.LoginTopAppBar
 
 @OptIn(ExperimentalComposeUiApi::class)
 @Composable
@@ -67,7 +67,7 @@ fun LoginScreen(
 
     Scaffold(
         topBar = {
-            ReaderTopAppBar(title = stringResource(R.string.logo_title))
+            LoginTopAppBar(title = stringResource(R.string.logo_title))
         }
     ) { paddingValues ->
         Surface(
