@@ -1,7 +1,5 @@
 package com.maddy.jetpackbookreader.screens.search
 
-import android.content.res.Configuration
-import android.util.Log
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -21,8 +19,13 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.rounded.Clear
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
+import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
@@ -36,24 +39,25 @@ import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.font.FontStyle
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
-import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
+import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
+import coil.compose.rememberAsyncImagePainter
 import com.maddy.jetpackbookreader.R
-import com.maddy.jetpackbookreader.model.ReadingBook
-import com.maddy.jetpackbookreader.ui.theme.JetpackBookReaderTheme
-import com.maddy.jetpackbookreader.utils.getBook
+import com.maddy.jetpackbookreader.model.Item
 import com.maddy.jetpackbookreader.widgets.ReaderTopAppBar
 
 @OptIn(ExperimentalComposeUiApi::class)
 @Composable
-fun SearchScreen(navController: NavController) {
+fun SearchScreen(navController: NavController, viewModel: SearchViewModel = hiltViewModel()) {
     val keyboardController = LocalSoftwareKeyboardController.current
-    val searchQueryState = rememberSaveable { mutableStateOf("") }
+    val searchQueryState = rememberSaveable { mutableStateOf("android") }
 
     Scaffold(
         topBar = {
@@ -82,22 +86,32 @@ fun SearchScreen(navController: NavController) {
                     keyboardActions = KeyboardActions(
                         onDone = {
                             keyboardController?.hide()
-                            Log.d("SearchScreen", "query: ${searchQueryState.value}")
+                            viewModel.searchBooks(searchQueryState.value.trim())
                         }
                     ),
                     singleLine = true,
                     maxLines = 1,
                     shape = RoundedCornerShape(size = 15.dp),
+                    trailingIcon = {
+                        IconButton(onClick = { searchQueryState.value = "" }) {
+                            Icon(
+                                imageVector = Icons.Rounded.Clear,
+                                contentDescription = stringResource(R.string.clear_icon)
+                            )
+                        }
+                    }
                 )
                 Spacer(Modifier.height(12.dp))
-                BookList(listOf(getBook(), getBook(), getBook(), ReadingBook()))
+                if (viewModel.isLoading) LinearProgressIndicator()
+                else BookList(viewModel.list)
             }
         }
     }
 }
 
 @Composable
-fun BookList(listOfBooks: List<ReadingBook>) {
+fun BookList(listOfBooks: List<Item>) {
+
     LazyColumn(
         modifier = Modifier.fillMaxSize(),
         contentPadding = PaddingValues(horizontal = 8.dp, vertical = 16.dp)
@@ -111,7 +125,10 @@ fun BookList(listOfBooks: List<ReadingBook>) {
 }
 
 @Composable
-fun NewBookCard(book: ReadingBook, onClick: (String?) -> Unit = {}) {
+fun NewBookCard(book: Item, onClick: (String?) -> Unit = {}) {
+    val unsplashLink =
+        "https://images.unsplash.com/photo-1589829085413-56de8ae18c73?q=80&w=1512&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D"
+    val imageUrl = book.volumeInfo.imageLinks?.smallThumbnail ?: unsplashLink
     Card(
         modifier = Modifier
             .padding(8.dp)
@@ -125,12 +142,12 @@ fun NewBookCard(book: ReadingBook, onClick: (String?) -> Unit = {}) {
         Row(
             modifier = Modifier
                 .fillMaxWidth()
-                .height(100.dp),
+                .height(120.dp),
             horizontalArrangement = Arrangement.Start,
             verticalAlignment = Alignment.CenterVertically
         ) {
             Image(
-                painter = painterResource(id = R.drawable.books_unsplash),
+                painter = rememberAsyncImagePainter(model = imageUrl),
                 modifier = Modifier
                     .padding(end = 4.dp)
                     .width(80.dp)
@@ -140,32 +157,42 @@ fun NewBookCard(book: ReadingBook, onClick: (String?) -> Unit = {}) {
             )
             Column(
                 modifier = Modifier
-                    .padding(4.dp)
+                    .padding(horizontal = 4.dp)
                     .fillMaxWidth(),
                 verticalArrangement = Arrangement.Center,
                 horizontalAlignment = Alignment.Start
             ) {
-                Text(text = book.title ?: "BookTitle")
-                Text(text = "Author: ${book.author ?: "Author"}")
-                Text(text = "Date: 2024-01-01")
-                Text(text = "[Computers]")
+                Text(
+                    text = book.volumeInfo.title,
+                    style = MaterialTheme.typography.labelLarge,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                    fontWeight = FontWeight.SemiBold
+                )
+                Text(
+                    text = "Authors: ${book.volumeInfo.authors}",
+                    style = MaterialTheme.typography.labelMedium,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                    fontStyle = FontStyle.Italic,
+                    maxLines = 2,
+                    overflow = TextOverflow.Ellipsis
+                )
+                Text(
+                    text = "Date: ${book.volumeInfo.publishedDate}",
+                    style = MaterialTheme.typography.labelMedium,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                    fontStyle = FontStyle.Italic,
+                    maxLines = 1,
+                    overflow = TextOverflow.Ellipsis
+                )
+                Text(
+                    text = "Category: ${book.volumeInfo.categories}",
+                    style = MaterialTheme.typography.labelMedium,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                    fontStyle = FontStyle.Italic,
+                    maxLines = 1,
+                    overflow = TextOverflow.Ellipsis
+                )
             }
         }
-    }
-}
-
-@Preview(showBackground = true)
-@Composable
-fun NewBookCardPreview() {
-    JetpackBookReaderTheme {
-        BookList(listOf(getBook(), getBook(), getBook(), ReadingBook()))
-    }
-}
-
-@Preview(name = "dark mode", uiMode = Configuration.UI_MODE_NIGHT_YES, showBackground = true)
-@Composable
-fun NewBookCardPreviewDark() {
-    JetpackBookReaderTheme {
-        BookList(listOf(getBook(), getBook(), getBook(), ReadingBook()))
     }
 }
