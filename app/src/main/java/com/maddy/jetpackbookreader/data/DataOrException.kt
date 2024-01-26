@@ -7,7 +7,7 @@ package com.maddy.jetpackbookreader.data
  *          loading, exception - are Metadata
  */
 data class DataOrException<T>(
-    val data: T? = null,
-    val loading: Boolean? = null,
-    val exception: Exception? = null
+    var data: T? = null,
+    var loading: Boolean? = null,
+    var exception: Exception? = null
 )
