@@ -86,7 +86,8 @@ fun SearchScreen(navController: NavController, viewModel: SearchViewModel = hilt
                     keyboardActions = KeyboardActions(
                         onDone = {
                             keyboardController?.hide()
-                            viewModel.searchBooks(searchQueryState.value.trim())
+                            // viewModel.searchBooks(searchQueryState.value.trim())
+                            viewModel.getBooks(searchQueryState.value.trim())
                         }
                     ),
                     singleLine = true,
@@ -102,8 +103,12 @@ fun SearchScreen(navController: NavController, viewModel: SearchViewModel = hilt
                     }
                 )
                 Spacer(Modifier.height(12.dp))
+
+//                if (viewModel.isLoading) LinearProgressIndicator()
+//                else BookList(viewModel.list)
                 if (viewModel.isLoading) LinearProgressIndicator()
-                else BookList(viewModel.list)
+                else BookList(viewModel.bookList)
+
             }
         }
     }
