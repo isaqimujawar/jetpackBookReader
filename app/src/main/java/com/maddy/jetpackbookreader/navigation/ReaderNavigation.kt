@@ -11,9 +11,10 @@ import com.maddy.jetpackbookreader.screens.home.HomeViewModel
 import com.maddy.jetpackbookreader.screens.login.CreateAccountScreen
 import com.maddy.jetpackbookreader.screens.login.LoginScreen
 import com.maddy.jetpackbookreader.screens.login.LoginViewModel
-import com.maddy.jetpackbookreader.screens.search.SearchScreen
-import com.maddy.jetpackbookreader.screens.splash.SplashScreen
 import com.maddy.jetpackbookreader.screens.readerstats.ReaderStatsScreen
+import com.maddy.jetpackbookreader.screens.search.SearchScreen
+import com.maddy.jetpackbookreader.screens.search.SearchViewModel
+import com.maddy.jetpackbookreader.screens.splash.SplashScreen
 import com.maddy.jetpackbookreader.screens.update.UpdateScreen
 
 @Composable
@@ -41,7 +42,8 @@ fun ReaderNavigation() {
             HomeScreen(navController = navController, viewModel = homeViewModel)
         }
         composable(route = ReaderScreens.SearchScreen.name) {
-            SearchScreen(navController = navController)
+            val searchViewModel = hiltViewModel<SearchViewModel>()
+            SearchScreen(navController = navController, viewModel = searchViewModel)
         }
         composable(route = ReaderScreens.BookDetailsScreen.name) {
             BookDetailsScreen(navController = navController)

@@ -1,6 +1,10 @@
 package com.maddy.jetpackbookreader.di
 
 import com.maddy.jetpackbookreader.network.BooksApi
+import com.maddy.jetpackbookreader.repository.BookRepository
+import com.maddy.jetpackbookreader.repository.BookRepositoryImpl
+import com.maddy.jetpackbookreader.repository.RemoteBookRepository
+import com.maddy.jetpackbookreader.repository.RemoteBookRepositoryImpl
 import com.maddy.jetpackbookreader.utils.ReaderConstants
 import dagger.Module
 import dagger.Provides
@@ -22,4 +26,12 @@ object AppModule {
             .build()
             .create(BooksApi::class.java)
     }
+
+    @Singleton
+    @Provides
+    fun provideRemoteBookRepository(api: BooksApi): RemoteBookRepository = RemoteBookRepositoryImpl(api)
+
+    @Singleton
+    @Provides
+    fun provideBookRepository(api: BooksApi): BookRepository = BookRepositoryImpl(api)
 }

@@ -8,6 +8,6 @@ package com.maddy.jetpackbookreader.data
  */
 data class DataOrException<T>(
     var data: T? = null,
-    var loading: Boolean? = null,
+    var loading: Boolean? = false,
     var exception: Exception? = null
 )

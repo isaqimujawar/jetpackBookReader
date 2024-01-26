@@ -24,4 +24,5 @@
     <string name="star_icon">Star icon</string>
     <string name="search">Search</string>
     <string name="enter_book_name">Enter Book Name</string>
+    <string name="clear_icon">Clear icon</string>
 </resources>
