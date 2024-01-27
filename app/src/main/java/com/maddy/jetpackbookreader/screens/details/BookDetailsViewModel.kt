@@ -4,8 +4,12 @@ import android.util.Log
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.maddy.jetpackbookreader.model.Item
 import com.maddy.jetpackbookreader.repository.BookRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
@@ -15,25 +19,19 @@ class BookDetailsViewModel @Inject constructor(
     private val savedStateHandle: SavedStateHandle
 ) : ViewModel() {
 
-      val title = savedStateHandle.getStateFlow(key = "title", initialValue = "")
-      val authors = savedStateHandle.getStateFlow(key = "authors", initialValue = "")
-      val categories = savedStateHandle.getStateFlow(key = "categories", initialValue = "")
-      val pageCount = savedStateHandle.getStateFlow(key = "pageCount", initialValue = "")
-      val thumbnail = savedStateHandle.getStateFlow(key = "thumbnail", initialValue = "")
+    // ViewModel SavedStateHandle - survives configuration changes and process death
+    val bookId = savedStateHandle.getStateFlow(key = "bookId", initialValue = "")
 
-    init {
-        getBookInfo("")
-    }
+    private val _bookItem = MutableStateFlow<Item>(value = Item())
+    val bookItem = _bookItem.asStateFlow()
 
     fun getBookInfo(bookId: String) {
+        savedStateHandle["bookId"] = bookId
         viewModelScope.launch {
             try {
-                val item = repository.getBookInfo(bookId).volumeInfo
-                savedStateHandle["title"] = item?.title.toString()
-                savedStateHandle["authors"] = item?.authors.toString()
-                savedStateHandle["categories"] = item?.categories.toString()
-                savedStateHandle["thumbnail"] = item?.imageLinks?.thumbnail.toString()
-                savedStateHandle["pageCount"] = item?.pageCount.toString()
+                _bookItem.update {
+                    repository.getBookInfo(bookId)
+                }
             } catch (e: Exception) {
                 Log.d("BookDetailsViewModel", "getBookInfo:  exception = ${e.localizedMessage}")
             }

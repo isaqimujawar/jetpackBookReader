@@ -25,6 +25,9 @@ fun BookDetailsScreen(
     viewModel: BookDetailsViewModel = hiltViewModel(),
     bookId: String
 ) {
+    // ViewModel SavedStateHandle - survives configuration changes and process death
+    val bookIdSavedStateHandle = viewModel.bookId.collectAsStateWithLifecycle().value
+
     Scaffold(
         topBar = {
             ReaderTopAppBar(title = stringResource(R.string.book_details)) {
@@ -52,17 +55,18 @@ fun BookDetailsScreen(
 
 @Composable
 fun ShowBookDetails(viewModel: BookDetailsViewModel) {
-    val title = viewModel.title.collectAsStateWithLifecycle().value
-    val authors = viewModel.authors.collectAsStateWithLifecycle().value
-    val categories = viewModel.categories.collectAsStateWithLifecycle().value
-    val pageCount = viewModel.pageCount.collectAsStateWithLifecycle().value
-    val thumbnail = viewModel.thumbnail.collectAsStateWithLifecycle().value
+    val volumeInfo = viewModel.bookItem.collectAsStateWithLifecycle().value.volumeInfo
 
-    if (title.isNullOrEmpty()) LinearProgressIndicator()
-
-    Text(text = title)
-    Text(text = authors)
-    Text(text = categories)
-    Text(text = pageCount)
-    Text(text = thumbnail)
+    if (volumeInfo == null) {
+        Column {
+            LinearProgressIndicator()
+            Text(text = "Loading book...")
+        }
+    } else {
+        Text(text = volumeInfo.title.toString())
+        Text(text = volumeInfo.authors.toString())
+        Text(text = volumeInfo.categories.toString())
+        Text(text = volumeInfo.pageCount.toString())
+        //Text(text = volumeInfo.imageLinks?.thumbnail.toString())
+    }
 }
