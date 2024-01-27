@@ -51,6 +51,7 @@ import androidx.navigation.NavController
 import coil.compose.rememberAsyncImagePainter
 import com.maddy.jetpackbookreader.R
 import com.maddy.jetpackbookreader.model.Item
+import com.maddy.jetpackbookreader.navigation.ReaderScreens
 import com.maddy.jetpackbookreader.widgets.ReaderTopAppBar
 
 @OptIn(ExperimentalComposeUiApi::class)
@@ -105,33 +106,31 @@ fun SearchScreen(navController: NavController, viewModel: SearchViewModel = hilt
                     }
                 )
                 Spacer(Modifier.height(12.dp))
-
-//                if (viewModel.isLoading) LinearProgressIndicator()
-//                else BookList(viewModel.list)
                 if (viewModel.isLoading) LinearProgressIndicator()
-                else BookList(viewModel.bookList)
+
+                // BookList(viewModel.list)
+                BookList(viewModel.bookList) { bookId ->
+                    navController.navigate(route = ReaderScreens.BookDetailsScreen.name + "/${bookId}")
+                }
             }
         }
     }
 }
 
 @Composable
-fun BookList(listOfBooks: List<Item>) {
-
+fun BookList(listOfBooks: List<Item>, onBookClicked: (String) -> Unit = {}) {
     LazyColumn(
         modifier = Modifier.fillMaxSize(),
         contentPadding = PaddingValues(horizontal = 8.dp, vertical = 16.dp)
     ) {
         items(items = listOfBooks) { book ->
-            NewBookCard(book) {
-                // TODO("Card onClick impl")
-            }
+            NewBookCard(book) { bookId -> onBookClicked(bookId) }
         }
     }
 }
 
 @Composable
-fun NewBookCard(book: Item, onClick: (String?) -> Unit = {}) {
+fun NewBookCard(book: Item, onClick: (String) -> Unit = {}) {
     val unsplashLink =
         "https://images.unsplash.com/photo-1589829085413-56de8ae18c73?q=80&w=1512&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D"
     val imageUrl = book.volumeInfo.imageLinks?.smallThumbnail ?: unsplashLink

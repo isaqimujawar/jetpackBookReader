@@ -1,18 +1,23 @@
 package com.maddy.jetpackbookreader.screens.details
 
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Surface
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import com.maddy.jetpackbookreader.R
 import com.maddy.jetpackbookreader.widgets.ReaderTopAppBar
 
 @Composable
-fun BookDetailsScreen(navController: NavController, bookId: String = "") {
+fun BookDetailsScreen(navController: NavController, bookId: String) {
     Scaffold(
         topBar = {
             ReaderTopAppBar(title = stringResource(R.string.book_details)) {
@@ -25,6 +30,15 @@ fun BookDetailsScreen(navController: NavController, bookId: String = "") {
                 .padding(paddingValues)
                 .fillMaxSize()
         ) {
+            Column(
+                modifier = Modifier
+                    .padding(8.dp)
+                    .fillMaxSize(),
+                verticalArrangement = Arrangement.Top,
+                horizontalAlignment = Alignment.CenterHorizontally
+            ) {
+                Text(text = "Book Id: $bookId")
+            }
 
         }
     }
