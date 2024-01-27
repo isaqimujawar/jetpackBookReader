@@ -42,7 +42,10 @@ class SearchViewModel @Inject constructor(
     fun getBooks(query: String) {
         isLoading = true
         viewModelScope.launch {
-            if (query.isEmpty()) return@launch
+            if (query.isEmpty()) {
+                isLoading = false
+                return@launch
+            }
             try {
                 bookList = repository.getBooks(query)
                 if (bookList.isNotEmpty()) {
@@ -52,7 +55,7 @@ class SearchViewModel @Inject constructor(
                 }
             } catch (e: Exception) {
                 isLoading = false
-                Log.d("SearchViewModel", "searchBooks(): ${e.localizedMessage}")
+                Log.d("SearchViewModel", "getBooks(): ${e.localizedMessage}")
             }
         }
     }

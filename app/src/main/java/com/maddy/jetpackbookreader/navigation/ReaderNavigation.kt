@@ -8,6 +8,7 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
 import com.maddy.jetpackbookreader.screens.details.BookDetailsScreen
+import com.maddy.jetpackbookreader.screens.details.BookDetailsViewModel
 import com.maddy.jetpackbookreader.screens.home.HomeScreen
 import com.maddy.jetpackbookreader.screens.home.HomeViewModel
 import com.maddy.jetpackbookreader.screens.login.CreateAccountScreen
@@ -54,8 +55,13 @@ fun ReaderNavigation() {
                 navArgument(name = "bookId", builder = { type = NavType.StringType })
             )
         ) { backStackEntry ->
+            val bookDetailsViewModel = hiltViewModel<BookDetailsViewModel>()
             backStackEntry.arguments?.getString("bookId")?.let {
-                BookDetailsScreen(navController = navController, bookId = it)
+                BookDetailsScreen(
+                    navController = navController,
+                    viewModel = bookDetailsViewModel,
+                    bookId = it
+                )
             }
         }
         composable(route = ReaderScreens.UpdateScreen.name) {

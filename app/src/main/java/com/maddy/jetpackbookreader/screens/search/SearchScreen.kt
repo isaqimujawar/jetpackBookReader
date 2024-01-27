@@ -133,13 +133,13 @@ fun BookList(listOfBooks: List<Item>, onBookClicked: (String) -> Unit = {}) {
 fun NewBookCard(book: Item, onClick: (String) -> Unit = {}) {
     val unsplashLink =
         "https://images.unsplash.com/photo-1589829085413-56de8ae18c73?q=80&w=1512&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D"
-    val imageUrl = book.volumeInfo.imageLinks?.smallThumbnail ?: unsplashLink
+    val imageUrl = book.volumeInfo?.imageLinks?.smallThumbnail ?: unsplashLink
     Card(
         modifier = Modifier
             .padding(8.dp)
             .fillMaxWidth()
             .wrapContentHeight()
-            .clickable { onClick(book.id) },
+            .clickable { onClick(book.id ?: "") },
         shape = RoundedCornerShape(8.dp),
         colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
         elevation = CardDefaults.cardElevation(6.dp),
@@ -168,13 +168,13 @@ fun NewBookCard(book: Item, onClick: (String) -> Unit = {}) {
                 horizontalAlignment = Alignment.Start
             ) {
                 Text(
-                    text = book.volumeInfo.title,
+                    text = "${book.volumeInfo?.title}",
                     style = MaterialTheme.typography.labelLarge,
                     color = MaterialTheme.colorScheme.onSurfaceVariant,
                     fontWeight = FontWeight.SemiBold
                 )
                 Text(
-                    text = "Authors: ${book.volumeInfo.authors}",
+                    text = "Authors: ${book.volumeInfo?.authors}",
                     style = MaterialTheme.typography.labelMedium,
                     color = MaterialTheme.colorScheme.onSurfaceVariant,
                     fontStyle = FontStyle.Italic,
@@ -182,7 +182,7 @@ fun NewBookCard(book: Item, onClick: (String) -> Unit = {}) {
                     overflow = TextOverflow.Ellipsis
                 )
                 Text(
-                    text = "Date: ${book.volumeInfo.publishedDate}",
+                    text = "Date: ${book.volumeInfo?.publishedDate}",
                     style = MaterialTheme.typography.labelMedium,
                     color = MaterialTheme.colorScheme.onSurfaceVariant,
                     fontStyle = FontStyle.Italic,
@@ -190,7 +190,7 @@ fun NewBookCard(book: Item, onClick: (String) -> Unit = {}) {
                     overflow = TextOverflow.Ellipsis
                 )
                 Text(
-                    text = "Category: ${book.volumeInfo.categories}",
+                    text = "Category: ${book.volumeInfo?.categories}",
                     style = MaterialTheme.typography.labelMedium,
                     color = MaterialTheme.colorScheme.onSurfaceVariant,
                     fontStyle = FontStyle.Italic,
