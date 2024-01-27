@@ -61,7 +61,9 @@ fun SearchScreen(navController: NavController, viewModel: SearchViewModel = hilt
 
     Scaffold(
         topBar = {
-            ReaderTopAppBar { navController.popBackStack() }
+            ReaderTopAppBar(title = stringResource(R.string.search_books)) {
+                navController.popBackStack()
+            }
         }
     ) { paddingValues ->
         Surface(
@@ -108,7 +110,6 @@ fun SearchScreen(navController: NavController, viewModel: SearchViewModel = hilt
 //                else BookList(viewModel.list)
                 if (viewModel.isLoading) LinearProgressIndicator()
                 else BookList(viewModel.bookList)
-
             }
         }
     }

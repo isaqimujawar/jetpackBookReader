@@ -18,8 +18,8 @@ import javax.inject.Inject
 /**
  *     Keep uiState ready for the UI
  * - UI is only responsible for displaying the uiState.
- * - ViewModel acts as the StateHolder that stores the state,
- * - and is responsible for making sure that it keeps that uiState is ready
+ * - ViewModel acts as the StateHolder that stores the uiState,
+ * - and is responsible for making sure that it keeps that uiState ready
  * - when the UI asks for the uiState.
  */
 @HiltViewModel

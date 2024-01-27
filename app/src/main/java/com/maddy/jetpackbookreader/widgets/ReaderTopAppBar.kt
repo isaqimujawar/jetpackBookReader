@@ -21,11 +21,14 @@ import com.maddy.jetpackbookreader.R
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun ReaderTopAppBar(onNavigationClicked: () -> Unit) {
+fun ReaderTopAppBar(
+    title: String = stringResource(R.string.title),
+    onNavigationClicked: () -> Unit = {}
+) {
     CenterAlignedTopAppBar(
         title = {
             Text(
-                text = "Search Books",
+                text = title,
                 style = MaterialTheme.typography.titleLarge,
                 color = MaterialTheme.colorScheme.primary,
                 fontWeight = FontWeight.SemiBold,
