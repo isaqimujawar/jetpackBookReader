@@ -4,7 +4,10 @@ import android.util.Log
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.firestore.FirebaseFirestore
 import com.maddy.jetpackbookreader.model.Item
+import com.maddy.jetpackbookreader.model.ReadingBook
 import com.maddy.jetpackbookreader.repository.BookRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -22,7 +25,7 @@ class BookDetailsViewModel @Inject constructor(
     // ViewModel SavedStateHandle - survives configuration changes and process death
     val bookId = savedStateHandle.getStateFlow(key = "bookId", initialValue = "")
 
-    private val _bookItem = MutableStateFlow<Item>(value = Item())
+    private val _bookItem = MutableStateFlow(value = Item())
     val bookItem = _bookItem.asStateFlow()
 
     fun getBookInfo(bookId: String) {
@@ -36,5 +39,41 @@ class BookDetailsViewModel @Inject constructor(
                 Log.d("BookDetailsViewModel", "getBookInfo:  exception = ${e.localizedMessage}")
             }
         }
+    }
+
+    fun saveToFirebase(bookItem: Item, onSuccessCompleted: () -> Unit) {
+        val book = createBook(bookItem)
+        val db = FirebaseFirestore.getInstance()
+        val dbCollection = db.collection("books")
+        dbCollection.add(book).addOnSuccessListener { documentRef ->
+            val documentId = documentRef.id
+            dbCollection
+                .document(documentId)
+                .update(hashMapOf("id" to documentId) as Map<String, Any>)
+                .addOnCompleteListener { task -> if (task.isSuccessful) onSuccessCompleted() }
+                .addOnFailureListener { exception ->
+                    Log.d(
+                        "BookDetailsViewModel",
+                        "saveToFirebase: Error updating document ${exception.localizedMessage}"
+                    )
+                }
+        }
+    }
+
+    private fun createBook(bookItem: Item): ReadingBook {
+        val volumeInfo = bookItem.volumeInfo
+        return ReadingBook(
+            title = volumeInfo?.title.toString(),
+            authors = volumeInfo?.authors.toString(),
+            notes = "",
+            photoUrl = volumeInfo?.imageLinks?.thumbnail.toString(),
+            categories = volumeInfo?.categories.toString(),
+            publishedDate = volumeInfo?.publishedDate.toString(),
+            rating = 0.0.toString(),
+            description = volumeInfo?.description.toString(),
+            pageCount = volumeInfo?.pageCount.toString(),
+            userId = FirebaseAuth.getInstance().currentUser?.uid.toString(),
+            googleBookId = bookItem.id
+        )
     }
 }

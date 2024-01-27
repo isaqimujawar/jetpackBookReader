@@ -1,5 +1,6 @@
 package com.maddy.jetpackbookreader.screens.details
 
+import android.widget.Toast
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Arrangement
@@ -23,6 +24,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
@@ -34,7 +36,7 @@ import coil.compose.rememberAsyncImagePainter
 import com.maddy.jetpackbookreader.R
 import com.maddy.jetpackbookreader.components.RoundedButton
 import com.maddy.jetpackbookreader.components.formatHttpText
-import com.maddy.jetpackbookreader.model.VolumeInfo
+import com.maddy.jetpackbookreader.model.Item
 import com.maddy.jetpackbookreader.widgets.ReaderTopAppBar
 
 @Composable
@@ -65,9 +67,12 @@ fun BookDetailsScreen(
 
 @Composable
 fun ShowBookDetails(navController: NavController, viewModel: BookDetailsViewModel) {
-    val volumeInfo = viewModel.bookItem.collectAsStateWithLifecycle().value.volumeInfo
+    val bookItem = viewModel.bookItem.collectAsStateWithLifecycle().value
 
-    if (volumeInfo != null) BookDetails(navController, volumeInfo) else ShowProgressIndicator()
+    if (bookItem != null)
+        BookDetails(navController, viewModel, bookItem)
+    else
+        ShowProgressIndicator()
 }
 
 @Composable
@@ -85,7 +90,14 @@ private fun ShowProgressIndicator() {
 }
 
 @Composable
-private fun BookDetails(navController: NavController, volumeInfo: VolumeInfo) {
+private fun BookDetails(
+    navController: NavController,
+    viewModel: BookDetailsViewModel,
+    bookItem: Item
+) {
+    val context = LocalContext.current
+    val volumeInfo = bookItem.volumeInfo
+
     Column(
         modifier = Modifier
             .padding(12.dp)
@@ -101,7 +113,7 @@ private fun BookDetails(navController: NavController, volumeInfo: VolumeInfo) {
             verticalAlignment = Alignment.CenterVertically
         ) {
             Image(
-                painter = rememberAsyncImagePainter(model = volumeInfo.imageLinks?.thumbnail),
+                painter = rememberAsyncImagePainter(model = volumeInfo?.imageLinks?.thumbnail),
                 contentDescription = stringResource(R.string.book_image),
                 contentScale = ContentScale.Fit,
                 modifier = Modifier
@@ -114,7 +126,11 @@ private fun BookDetails(navController: NavController, volumeInfo: VolumeInfo) {
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
                 RoundedButton(text = "Save") {
-                    // Todo("Save book to Firestore")
+                    // Save book to Firestore
+                    viewModel.saveToFirebase(bookItem) {
+                        Toast.makeText(context, "Book Saved", Toast.LENGTH_SHORT).show()
+                        navController.popBackStack()
+                    }
                 }
                 RoundedButton(text = "Back") {
                     navController.popBackStack()
@@ -122,25 +138,25 @@ private fun BookDetails(navController: NavController, volumeInfo: VolumeInfo) {
             }
         }
         Text(
-            text = volumeInfo.title.toString(),
+            text = volumeInfo?.title.toString(),
             style = MaterialTheme.typography.titleLarge,
             color = MaterialTheme.colorScheme.primary,
             fontWeight = FontWeight.SemiBold
         )
         Text(
-            text = stringResource(R.string.authors) + volumeInfo.authors.toString(),
+            text = stringResource(R.string.authors) + volumeInfo?.authors.toString(),
             style = MaterialTheme.typography.titleMedium,
             color = MaterialTheme.colorScheme.onSurfaceVariant,
         )
         Text(
-            text = stringResource(R.string.categories) + volumeInfo.categories.toString(),
+            text = stringResource(R.string.categories) + volumeInfo?.categories.toString(),
             style = MaterialTheme.typography.titleMedium,
             color = MaterialTheme.colorScheme.onSurfaceVariant,
             maxLines = 3,
             overflow = TextOverflow.Ellipsis
         )
         Text(
-            text = stringResource(R.string.page_count) + volumeInfo.pageCount.toString(),
+            text = stringResource(R.string.page_count) + volumeInfo?.pageCount.toString(),
             style = MaterialTheme.typography.titleMedium,
             color = MaterialTheme.colorScheme.onSurfaceVariant,
         )
@@ -155,7 +171,7 @@ private fun BookDetails(navController: NavController, volumeInfo: VolumeInfo) {
                 horizontalArrangement = Arrangement.Start,
                 verticalAlignment = Alignment.Top
             ) {
-                Text(text = formatHttpText(httpText = volumeInfo.description))
+                Text(text = formatHttpText(httpText = volumeInfo?.description))
             }
         }
     }

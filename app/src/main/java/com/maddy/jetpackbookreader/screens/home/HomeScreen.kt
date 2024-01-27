@@ -176,7 +176,7 @@ fun BookCard(book: ReadingBook, onClick: (String?) -> Unit = {}) {
     ) {
         Column {
             BookImageAndRating(imageUrl = "", rating = 4.5.toString())
-            BookTitleAndAuthor(book.title, book.author)
+            BookTitleAndAuthor(book.title, book.authors)
             Row(
                 modifier = Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.End,
