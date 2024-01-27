@@ -51,17 +51,20 @@ import androidx.navigation.NavController
 import coil.compose.rememberAsyncImagePainter
 import com.maddy.jetpackbookreader.R
 import com.maddy.jetpackbookreader.model.Item
+import com.maddy.jetpackbookreader.navigation.ReaderScreens
 import com.maddy.jetpackbookreader.widgets.ReaderTopAppBar
 
 @OptIn(ExperimentalComposeUiApi::class)
 @Composable
 fun SearchScreen(navController: NavController, viewModel: SearchViewModel = hiltViewModel()) {
     val keyboardController = LocalSoftwareKeyboardController.current
-    val searchQueryState = rememberSaveable { mutableStateOf("android") }
+    val searchQueryState = rememberSaveable { mutableStateOf("bodybuilding") }
 
     Scaffold(
         topBar = {
-            ReaderTopAppBar { navController.popBackStack() }
+            ReaderTopAppBar(title = stringResource(R.string.search_books)) {
+                navController.popBackStack()
+            }
         }
     ) { paddingValues ->
         Surface(
@@ -103,43 +106,40 @@ fun SearchScreen(navController: NavController, viewModel: SearchViewModel = hilt
                     }
                 )
                 Spacer(Modifier.height(12.dp))
-
-//                if (viewModel.isLoading) LinearProgressIndicator()
-//                else BookList(viewModel.list)
                 if (viewModel.isLoading) LinearProgressIndicator()
-                else BookList(viewModel.bookList)
 
+                // BookList(viewModel.list)
+                BookList(viewModel.bookList) { bookId ->
+                    navController.navigate(route = ReaderScreens.BookDetailsScreen.name + "/${bookId}")
+                }
             }
         }
     }
 }
 
 @Composable
-fun BookList(listOfBooks: List<Item>) {
-
+fun BookList(listOfBooks: List<Item>, onBookClicked: (String) -> Unit = {}) {
     LazyColumn(
         modifier = Modifier.fillMaxSize(),
         contentPadding = PaddingValues(horizontal = 8.dp, vertical = 16.dp)
     ) {
         items(items = listOfBooks) { book ->
-            NewBookCard(book) {
-                // TODO("Card onClick impl")
-            }
+            NewBookCard(book) { bookId -> onBookClicked(bookId) }
         }
     }
 }
 
 @Composable
-fun NewBookCard(book: Item, onClick: (String?) -> Unit = {}) {
+fun NewBookCard(book: Item, onClick: (String) -> Unit = {}) {
     val unsplashLink =
         "https://images.unsplash.com/photo-1589829085413-56de8ae18c73?q=80&w=1512&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D"
-    val imageUrl = book.volumeInfo.imageLinks?.smallThumbnail ?: unsplashLink
+    val imageUrl = book.volumeInfo?.imageLinks?.smallThumbnail ?: unsplashLink
     Card(
         modifier = Modifier
             .padding(8.dp)
             .fillMaxWidth()
             .wrapContentHeight()
-            .clickable { onClick(book.id) },
+            .clickable { onClick(book.id ?: "") },
         shape = RoundedCornerShape(8.dp),
         colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
         elevation = CardDefaults.cardElevation(6.dp),
@@ -168,13 +168,13 @@ fun NewBookCard(book: Item, onClick: (String?) -> Unit = {}) {
                 horizontalAlignment = Alignment.Start
             ) {
                 Text(
-                    text = book.volumeInfo.title,
+                    text = "${book.volumeInfo?.title}",
                     style = MaterialTheme.typography.labelLarge,
                     color = MaterialTheme.colorScheme.onSurfaceVariant,
                     fontWeight = FontWeight.SemiBold
                 )
                 Text(
-                    text = "Authors: ${book.volumeInfo.authors}",
+                    text = "Authors: ${book.volumeInfo?.authors}",
                     style = MaterialTheme.typography.labelMedium,
                     color = MaterialTheme.colorScheme.onSurfaceVariant,
                     fontStyle = FontStyle.Italic,
@@ -182,7 +182,7 @@ fun NewBookCard(book: Item, onClick: (String?) -> Unit = {}) {
                     overflow = TextOverflow.Ellipsis
                 )
                 Text(
-                    text = "Date: ${book.volumeInfo.publishedDate}",
+                    text = "Date: ${book.volumeInfo?.publishedDate}",
                     style = MaterialTheme.typography.labelMedium,
                     color = MaterialTheme.colorScheme.onSurfaceVariant,
                     fontStyle = FontStyle.Italic,
@@ -190,7 +190,7 @@ fun NewBookCard(book: Item, onClick: (String?) -> Unit = {}) {
                     overflow = TextOverflow.Ellipsis
                 )
                 Text(
-                    text = "Category: ${book.volumeInfo.categories}",
+                    text = "Category: ${book.volumeInfo?.categories}",
                     style = MaterialTheme.typography.labelMedium,
                     color = MaterialTheme.colorScheme.onSurfaceVariant,
                     fontStyle = FontStyle.Italic,

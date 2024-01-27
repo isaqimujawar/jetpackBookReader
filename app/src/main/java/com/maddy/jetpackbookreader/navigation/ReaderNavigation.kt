@@ -2,10 +2,13 @@ package com.maddy.jetpackbookreader.navigation
 
 import androidx.compose.runtime.Composable
 import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
+import androidx.navigation.navArgument
 import com.maddy.jetpackbookreader.screens.details.BookDetailsScreen
+import com.maddy.jetpackbookreader.screens.details.BookDetailsViewModel
 import com.maddy.jetpackbookreader.screens.home.HomeScreen
 import com.maddy.jetpackbookreader.screens.home.HomeViewModel
 import com.maddy.jetpackbookreader.screens.login.CreateAccountScreen
@@ -45,8 +48,21 @@ fun ReaderNavigation() {
             val searchViewModel = hiltViewModel<SearchViewModel>()
             SearchScreen(navController = navController, viewModel = searchViewModel)
         }
-        composable(route = ReaderScreens.BookDetailsScreen.name) {
-            BookDetailsScreen(navController = navController)
+        val routeAddress = ReaderScreens.BookDetailsScreen.name + "/{bookId}"
+        composable(
+            route = routeAddress,
+            arguments = listOf(
+                navArgument(name = "bookId", builder = { type = NavType.StringType })
+            )
+        ) { backStackEntry ->
+            val bookDetailsViewModel = hiltViewModel<BookDetailsViewModel>()
+            backStackEntry.arguments?.getString("bookId")?.let {
+                BookDetailsScreen(
+                    navController = navController,
+                    viewModel = bookDetailsViewModel,
+                    bookId = it
+                )
+            }
         }
         composable(route = ReaderScreens.UpdateScreen.name) {
             UpdateScreen(navController = navController)

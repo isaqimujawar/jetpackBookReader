@@ -18,8 +18,8 @@ import javax.inject.Inject
 /**
  *     Keep uiState ready for the UI
  * - UI is only responsible for displaying the uiState.
- * - ViewModel acts as the StateHolder that stores the state,
- * - and is responsible for making sure that it keeps that uiState is ready
+ * - ViewModel acts as the StateHolder that stores the uiState,
+ * - and is responsible for making sure that it keeps that uiState ready
  * - when the UI asks for the uiState.
  */
 @HiltViewModel
@@ -35,14 +35,17 @@ class SearchViewModel @Inject constructor(
     }
 
     private fun loadBooks() {
-        getBooks("android")
-        // searchBooks(query = "android")
+        getBooks("bodybuilding")
+        // searchBooks(query = "bodybuilding")
     }
 
     fun getBooks(query: String) {
         isLoading = true
         viewModelScope.launch {
-            if (query.isEmpty()) return@launch
+            if (query.isEmpty()) {
+                isLoading = false
+                return@launch
+            }
             try {
                 bookList = repository.getBooks(query)
                 if (bookList.isNotEmpty()) {
@@ -52,7 +55,7 @@ class SearchViewModel @Inject constructor(
                 }
             } catch (e: Exception) {
                 isLoading = false
-                Log.d("SearchViewModel", "searchBooks(): ${e.localizedMessage}")
+                Log.d("SearchViewModel", "getBooks(): ${e.localizedMessage}")
             }
         }
     }
