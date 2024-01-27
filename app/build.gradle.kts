@@ -53,6 +53,7 @@ android {
 }
 
 dependencies {
+    implementation("androidx.lifecycle:lifecycle-runtime-compose:2.7.0")
     val composeVersion = "1.5.4"
     val hiltVersion = "2.50"
 
