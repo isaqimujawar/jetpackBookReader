@@ -7,6 +7,7 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.rememberScrollState
@@ -31,6 +32,7 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavController
 import coil.compose.rememberAsyncImagePainter
 import com.maddy.jetpackbookreader.R
+import com.maddy.jetpackbookreader.components.RoundedButton
 import com.maddy.jetpackbookreader.components.formatHttpText
 import com.maddy.jetpackbookreader.model.VolumeInfo
 import com.maddy.jetpackbookreader.widgets.ReaderTopAppBar
@@ -56,17 +58,16 @@ fun BookDetailsScreen(
                 .padding(paddingValues)
                 .fillMaxSize()
         ) {
-            viewModel.getBookInfo(bookId).run { ShowBookDetails(viewModel) }
-
+            viewModel.getBookInfo(bookId).run { ShowBookDetails(navController, viewModel) }
         }
     }
 }
 
 @Composable
-fun ShowBookDetails(viewModel: BookDetailsViewModel) {
+fun ShowBookDetails(navController: NavController, viewModel: BookDetailsViewModel) {
     val volumeInfo = viewModel.bookItem.collectAsStateWithLifecycle().value.volumeInfo
 
-    if (volumeInfo != null) BookDetails(volumeInfo) else ShowProgressIndicator()
+    if (volumeInfo != null) BookDetails(navController, volumeInfo) else ShowProgressIndicator()
 }
 
 @Composable
@@ -84,17 +85,19 @@ private fun ShowProgressIndicator() {
 }
 
 @Composable
-private fun BookDetails(volumeInfo: VolumeInfo) {
+private fun BookDetails(navController: NavController, volumeInfo: VolumeInfo) {
     Column(
         modifier = Modifier
-            .padding(8.dp)
+            .padding(12.dp)
             .fillMaxSize(),
         verticalArrangement = Arrangement.Top,
         horizontalAlignment = Alignment.Start
     ) {
         Row(
-            modifier = Modifier.fillMaxWidth(),
-            horizontalArrangement = Arrangement.Center,
+            modifier = Modifier
+                .padding(bottom = 8.dp)
+                .fillMaxWidth(),
+            horizontalArrangement = Arrangement.SpaceEvenly,
             verticalAlignment = Alignment.CenterVertically
         ) {
             Image(
@@ -105,11 +108,23 @@ private fun BookDetails(volumeInfo: VolumeInfo) {
                     .size(150.dp)
                     .clip(RoundedCornerShape(16.dp))
             )
+            Column(
+                modifier = Modifier.height(120.dp),
+                verticalArrangement = Arrangement.SpaceBetween,
+                horizontalAlignment = Alignment.CenterHorizontally
+            ) {
+                RoundedButton(text = "Save") {
+                    // Todo("Save book to Firestore")
+                }
+                RoundedButton(text = "Back") {
+                    navController.popBackStack()
+                }
+            }
         }
         Text(
             text = volumeInfo.title.toString(),
             style = MaterialTheme.typography.titleLarge,
-            color = MaterialTheme.colorScheme.onSurfaceVariant,
+            color = MaterialTheme.colorScheme.primary,
             fontWeight = FontWeight.SemiBold
         )
         Text(
@@ -130,12 +145,11 @@ private fun BookDetails(volumeInfo: VolumeInfo) {
             color = MaterialTheme.colorScheme.onSurfaceVariant,
         )
         Surface(
-            modifier = Modifier.padding(8.dp),
             border = BorderStroke(2.dp, MaterialTheme.colorScheme.onSurface)
         ) {
             Row(
                 modifier = Modifier
-                    .padding(4.dp)
+                    .padding(8.dp)
                     .fillMaxSize()
                     .verticalScroll(rememberScrollState()),
                 horizontalArrangement = Arrangement.Start,

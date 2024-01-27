@@ -36,11 +36,9 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
@@ -48,6 +46,7 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
 import com.maddy.jetpackbookreader.R
+import com.maddy.jetpackbookreader.components.RoundedButton
 import com.maddy.jetpackbookreader.components.TitleText
 import com.maddy.jetpackbookreader.model.ReadingBook
 import com.maddy.jetpackbookreader.navigation.ReaderScreens
@@ -178,7 +177,13 @@ fun BookCard(book: ReadingBook, onClick: (String?) -> Unit = {}) {
         Column {
             BookImageAndRating(imageUrl = "", rating = 4.5.toString())
             BookTitleAndAuthor(book.title, book.author)
-            ReadingSurface("Reading")
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.End,
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                RoundedButton("Reading")
+            }
         }
     }
 }
@@ -258,30 +263,6 @@ private fun BookTitleAndAuthor(title: String?, author: String?) {
             maxLines = 1,
             overflow = TextOverflow.Ellipsis
         )
-    }
-}
-
-@Composable
-private fun ReadingSurface(text: String) {
-    Row(
-        modifier = Modifier.fillMaxWidth(),
-        horizontalArrangement = Arrangement.End,
-        verticalAlignment = Alignment.CenterVertically
-    ) {
-        Surface(
-            Modifier
-                .clip(RoundedCornerShape(topStartPercent = 29, bottomEndPercent = 29)),
-            color = MaterialTheme.colorScheme.primary
-        ) {
-            Text(
-                text = text,
-                modifier = Modifier.padding(8.dp),
-                style = MaterialTheme.typography.titleMedium,
-                color = MaterialTheme.colorScheme.onPrimary,
-                fontStyle = FontStyle.Italic,
-                fontWeight = FontWeight.SemiBold
-            )
-        }
     }
 }
 
