@@ -62,7 +62,9 @@ fun HomeScreen(
 
     Scaffold(
         topBar = {
-            HomeTopAppBar {
+            HomeTopAppBar(
+                onRefreshClicked = { viewModel.getAllBooks()}
+            ) {
                 viewModel.signOut().run {
                     navController.navigate(route = ReaderScreens.LoginScreen.name) {
                         popUpTo(navController.graph.id) {

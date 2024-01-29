@@ -3,6 +3,7 @@ package com.maddy.jetpackbookreader.widgets
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Menu
+import androidx.compose.material.icons.rounded.Refresh
 import androidx.compose.material3.CenterAlignedTopAppBar
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
@@ -22,7 +23,7 @@ import com.maddy.jetpackbookreader.R
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun HomeTopAppBar(modifier: Modifier = Modifier, onSignOutClicked: () -> Unit) {
+fun HomeTopAppBar(modifier: Modifier = Modifier, onRefreshClicked:() -> Unit = {}, onSignOutClicked: () -> Unit) {
     CenterAlignedTopAppBar(
         title = {
             Text(
@@ -43,8 +44,15 @@ fun HomeTopAppBar(modifier: Modifier = Modifier, onSignOutClicked: () -> Unit) {
         },
         actions = {
             IconButton(onClick = {
+                onRefreshClicked()
+            }) {
+                Icon(
+                    imageVector = Icons.Rounded.Refresh,
+                    contentDescription = stringResource(R.string.refresh_icon)
+                )
+            }
+            IconButton(onClick = {
                 onSignOutClicked()
-
             }) {
                 Icon(
                     painter = painterResource(id = R.drawable.logout_icon),

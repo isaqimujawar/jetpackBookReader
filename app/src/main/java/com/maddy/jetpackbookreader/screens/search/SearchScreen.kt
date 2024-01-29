@@ -58,7 +58,7 @@ import com.maddy.jetpackbookreader.widgets.ReaderTopAppBar
 @Composable
 fun SearchScreen(navController: NavController, viewModel: SearchViewModel = hiltViewModel()) {
     val keyboardController = LocalSoftwareKeyboardController.current
-    val searchQueryState = rememberSaveable { mutableStateOf("bodybuilding") }
+    val searchQueryState = rememberSaveable { mutableStateOf("Cooking") }
 
     Scaffold(
         topBar = {
