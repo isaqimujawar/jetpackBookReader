@@ -37,7 +37,6 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
@@ -45,6 +44,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
+import coil.compose.rememberAsyncImagePainter
 import com.maddy.jetpackbookreader.R
 import com.maddy.jetpackbookreader.components.RoundedButton
 import com.maddy.jetpackbookreader.components.TitleText
@@ -63,7 +63,7 @@ fun HomeScreen(
     Scaffold(
         topBar = {
             HomeTopAppBar(
-                onRefreshClicked = { viewModel.getAllBooks()}
+                onRefreshClicked = { viewModel.getAllBooks() }
             ) {
                 viewModel.signOut().run {
                     navController.navigate(route = ReaderScreens.LoginScreen.name) {
@@ -126,10 +126,10 @@ fun HomeContent(
         /*BookCard(book = getBook()) {
             // Todo("Card OnClick impl")
         }*/
-        ReadingList(listOfBooks)
+        ReadingBookList(listOfBooks)
         Spacer(modifier = Modifier.height(12.dp))
         TitleText("Reading List")
-        ReadingList(listOfBooks)
+        ReadingBookList(listOfBooks)
     }
 }
 
@@ -180,7 +180,7 @@ fun BookCard(book: ReadingBook, onClick: (String?) -> Unit = {}) {
         elevation = CardDefaults.cardElevation(6.dp),
     ) {
         Column {
-            BookImageAndRating(imageUrl = "", rating = 4.5.toString())
+            BookImageAndRating(imageUrl = book.photoUrl, rating = book.rating)
             BookTitleAndAuthor(book.title, book.authors)
             Row(
                 modifier = Modifier.fillMaxWidth(),
@@ -194,7 +194,9 @@ fun BookCard(book: ReadingBook, onClick: (String?) -> Unit = {}) {
 }
 
 @Composable
-private fun BookImageAndRating(imageUrl: String, rating: String) {
+private fun BookImageAndRating(imageUrl: String?, rating: String?) {
+    val photoUrl = imageUrl ?: stringResource(R.string.stock_image_unsplash_url)
+
     Row(
         modifier = Modifier
             .fillMaxWidth()
@@ -203,19 +205,19 @@ private fun BookImageAndRating(imageUrl: String, rating: String) {
         verticalAlignment = Alignment.CenterVertically
     ) {
         Image(
-            painter = painterResource(id = R.drawable.books_unsplash),
+            painter = rememberAsyncImagePainter(model = photoUrl),
             modifier = Modifier
                 .width(200.dp)
                 .fillMaxHeight(),
             contentDescription = stringResource(R.string.book_image),
             contentScale = ContentScale.Crop
         )
-        BookRating(rating)
+        BookRating(rating ?: "4.0")
     }
 }
 
 @Composable
-fun BookRating(rating: String = "4.0") {
+fun BookRating(rating: String) {
     Column(
         modifier = Modifier.padding(end = 8.dp),
         verticalArrangement = Arrangement.Center,
@@ -272,7 +274,7 @@ private fun BookTitleAndAuthor(title: String?, author: String?) {
 }
 
 @Composable
-fun ReadingList(listOfBooks: List<ReadingBook>) {
+fun ReadingBookList(listOfBooks: List<ReadingBook>) {
     LazyRow {
         items(items = listOfBooks) {
             BookCard(book = it) {
