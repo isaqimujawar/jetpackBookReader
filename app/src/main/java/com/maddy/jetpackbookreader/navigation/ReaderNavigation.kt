@@ -48,24 +48,27 @@ fun ReaderNavigation() {
             val searchViewModel = hiltViewModel<SearchViewModel>()
             SearchScreen(navController = navController, viewModel = searchViewModel)
         }
-        val routeAddress = ReaderScreens.BookDetailsScreen.name + "/{bookId}"
         composable(
-            route = routeAddress,
+            route = ReaderScreens.BookDetailsScreen.name + "/{bookId}",
             arguments = listOf(
                 navArgument(name = "bookId", builder = { type = NavType.StringType })
             )
         ) { backStackEntry ->
             val bookDetailsViewModel = hiltViewModel<BookDetailsViewModel>()
-            backStackEntry.arguments?.getString("bookId")?.let {
-                BookDetailsScreen(
-                    navController = navController,
-                    viewModel = bookDetailsViewModel,
-                    bookId = it
-                )
+            backStackEntry.arguments?.getString("bookId")?.let { bookId ->
+                BookDetailsScreen(navController, bookDetailsViewModel, bookId)
             }
         }
-        composable(route = ReaderScreens.UpdateScreen.name) {
-            UpdateScreen(navController = navController)
+        composable(
+            route = ReaderScreens.UpdateScreen.name + "/{bookId}",
+            arguments = listOf(
+                navArgument(name = "bookId", builder = { type = NavType.StringType })
+            )
+        ) { navBackStackEntry ->
+            navBackStackEntry.arguments?.getString("bookId")?.let { bookId ->
+                val homeViewModel = hiltViewModel<HomeViewModel>()
+                UpdateScreen(navController, homeViewModel, bookId)
+            }
         }
         composable(route = ReaderScreens.ReaderStatsScreen.name) {
             ReaderStatsScreen(navController = navController)

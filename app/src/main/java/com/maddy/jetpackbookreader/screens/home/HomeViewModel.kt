@@ -14,8 +14,8 @@ import javax.inject.Inject
 
 @HiltViewModel
 class HomeViewModel @Inject constructor(private val repository: FireRepository) : ViewModel() {
-    private val currentUser = FirebaseAuth.getInstance().currentUser
     val books = mutableStateOf(DataOrException<List<ReadingBook>>())
+    private val currentUser = FirebaseAuth.getInstance().currentUser
 
     init {
         getAllBooks()
@@ -34,10 +34,15 @@ class HomeViewModel @Inject constructor(private val repository: FireRepository) 
         FirebaseAuth.getInstance().signOut()
     }
 
-    fun getReadingBookList(): List<ReadingBook> = if (!books.value.data.isNullOrEmpty()) {
-        books.value.data!!.toList().filter { readingBook ->
-            // here the predicate is that the books should belong to the currentUser.uid
-            readingBook.userId == currentUser?.uid
-        }
-    } else emptyList<ReadingBook>()
+    fun getReadingBookList(): List<ReadingBook> =
+        if (!books.value.data.isNullOrEmpty()) {
+            books.value.data!!.toList().filter { readingBook ->
+                // here the predicate is that the books should belong to the currentUser.uid
+                readingBook.userId == currentUser?.uid
+            }
+        } else emptyList<ReadingBook>()
+
+    fun getBookById(bookId: String): ReadingBook {
+        return getReadingBookList().firstOrNull { it.id == bookId } ?: ReadingBook()
+    }
 }

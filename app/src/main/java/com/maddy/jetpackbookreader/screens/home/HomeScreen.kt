@@ -126,10 +126,10 @@ fun HomeContent(
         /*BookCard(book = getBook()) {
             // Todo("Card OnClick impl")
         }*/
-        ReadingBookList(listOfBooks)
+        ReadingBookList(navController, listOfBooks)
         Spacer(modifier = Modifier.height(12.dp))
         TitleText("Reading List")
-        ReadingBookList(listOfBooks)
+        ReadingBookList(navController, listOfBooks)
     }
 }
 
@@ -274,11 +274,11 @@ private fun BookTitleAndAuthor(title: String?, author: String?) {
 }
 
 @Composable
-fun ReadingBookList(listOfBooks: List<ReadingBook>) {
+fun ReadingBookList(navController: NavController, listOfBooks: List<ReadingBook>) {
     LazyRow {
         items(items = listOfBooks) {
-            BookCard(book = it) {
-                // TODO("Card OnClick impl")
+            BookCard(book = it) { bookId ->
+                navController.navigate(ReaderScreens.UpdateScreen.name + "/$bookId")
             }
         }
     }

@@ -33,4 +33,5 @@
     <string name="page_count">Page Count: </string>
     <string name="refresh_icon">Refresh icon</string>
     <string name="stock_image_unsplash_url"><![CDATA[https://images.unsplash.com/photo-1592496431122-2349e0fbc666?w=500&auto=format&fit=crop&q=60&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxzZWFyY2h8Mnx8Ym9vayUyMGNvdmVyfGVufDB8fDB8fHww]]></string>
+    <string name="update_book">Update Book</string>
 </resources>
