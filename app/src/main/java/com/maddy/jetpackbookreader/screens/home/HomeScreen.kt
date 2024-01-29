@@ -58,7 +58,7 @@ import com.maddy.jetpackbookreader.widgets.HomeTopAppBar
 fun HomeScreen(
     navController: NavController, viewModel: HomeViewModel = hiltViewModel()
 ) {
-    val displayName = viewModel.getUserDisplayName()
+
 
     Scaffold(
         topBar = {
@@ -83,7 +83,7 @@ fun HomeScreen(
                 .padding(paddingValues = paddingValues)
                 .fillMaxSize()
         ) {
-            HomeContent(navController, displayName = displayName)
+            HomeContent(navController, viewModel)
         }
     }
 }
@@ -107,9 +107,11 @@ private fun FABAddBook(onFABClicked: () -> Unit) {
 @Composable
 fun HomeContent(
     navController: NavController,
-    modifier: Modifier = Modifier,
-    displayName: String
+    viewModel: HomeViewModel,
+    modifier: Modifier = Modifier
 ) {
+    val displayName = viewModel.getUserDisplayName()
+    val listOfBooks: List<ReadingBook> = viewModel.getReadingBookList()
     Column(
         modifier = modifier
             .padding(8.dp)
@@ -119,12 +121,13 @@ fun HomeContent(
         TitleSection(modifier, displayName) {
             navController.navigate(route = ReaderScreens.ReaderStatsScreen.name)
         }
-        BookCard(book = getBook()) {
+        /*BookCard(book = getBook()) {
             // Todo("Card OnClick impl")
-        }
+        }*/
+        ReadingList(listOfBooks)
         Spacer(modifier = Modifier.height(12.dp))
         TitleText("Reading List")
-        ReadingList(listOfBooks = listOf(getBook(), getBook(), getBook()))
+        ReadingList(listOfBooks)
     }
 }
 
@@ -252,7 +255,7 @@ private fun BookTitleAndAuthor(title: String?, author: String?) {
     ) {
         Text(
             text = title ?: "Book Title",
-            style = MaterialTheme.typography.headlineMedium,
+            style = MaterialTheme.typography.headlineSmall,
             fontWeight = FontWeight.SemiBold,
             maxLines = 1,
             overflow = TextOverflow.Ellipsis

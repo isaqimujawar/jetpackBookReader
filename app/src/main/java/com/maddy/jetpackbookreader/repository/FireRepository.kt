@@ -7,7 +7,7 @@ import kotlinx.coroutines.tasks.await
 import javax.inject.Inject
 
 class FireRepository @Inject constructor(private val firestoreQuery: Query) {
-    suspend fun getAllBooksFromFirebase(): DataOrException<List<ReadingBook>> {
+    suspend fun getAllBooks(): DataOrException<List<ReadingBook>> {
         val dataOrException = DataOrException<List<ReadingBook>>()
 
         try {
