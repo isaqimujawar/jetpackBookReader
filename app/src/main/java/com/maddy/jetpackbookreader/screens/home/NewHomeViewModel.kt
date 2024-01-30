@@ -33,9 +33,9 @@ class NewHomeViewModel @Inject constructor(private val repository: NewFireReposi
         }
     }
 
-    fun getBookById(bookId: String): ReadingBook? {
+    fun getBookById(bookId: String): ReadingBook {
         return   if (errorStateFlow.value == null)
-         bookListStateFlow.value.firstOrNull { it.id == bookId }
+         bookListStateFlow.value.firstOrNull { it.id == bookId } ?: ReadingBook()
         else
             ReadingBook()
     }

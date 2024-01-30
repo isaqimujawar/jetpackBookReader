@@ -206,10 +206,10 @@ private fun BookImageAndRating(imageUrl: String?, rating: String?) {
     ) {
         Image(
             painter = rememberAsyncImagePainter(model = photoUrl),
+            contentDescription = stringResource(R.string.book_image),
             modifier = Modifier
                 .width(200.dp)
                 .fillMaxHeight(),
-            contentDescription = stringResource(R.string.book_image),
             contentScale = ContentScale.Crop
         )
         BookRating(rating ?: "4.0")

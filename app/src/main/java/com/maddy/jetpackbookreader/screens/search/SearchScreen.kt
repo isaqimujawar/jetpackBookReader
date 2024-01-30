@@ -153,11 +153,11 @@ fun NewBookCard(book: Item, onClick: (String) -> Unit = {}) {
         ) {
             Image(
                 painter = rememberAsyncImagePainter(model = imageUrl),
+                contentDescription = stringResource(R.string.book_image),
                 modifier = Modifier
                     .padding(end = 4.dp)
                     .width(80.dp)
                     .fillMaxHeight(),
-                contentDescription = stringResource(R.string.book_image),
                 contentScale = ContentScale.Crop
             )
             Column(
