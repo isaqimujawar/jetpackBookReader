@@ -22,6 +22,7 @@ import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -31,6 +32,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
@@ -92,6 +94,57 @@ fun ShowBookUpdate(book: ReadingBook = getBook()) {
         EditNoteTextField(book.notes ?: "Book Notes") { note ->
             Log.d("UpdateScreen", "EditNotesTextField: $note ")
             // TODO("Save the note to the given book")
+        }
+        StartAndFinishReadingButtons()
+    }
+}
+
+@Composable
+fun StartAndFinishReadingButtons() {
+    var startReadingState by rememberSaveable { mutableStateOf("Start Reading") }
+    var finishReadingState by rememberSaveable { mutableStateOf("Mark as Read") }
+
+    var startReadingEnabled by rememberSaveable { mutableStateOf(true) }
+    var finishReadingEnabled by rememberSaveable { mutableStateOf(true) }
+
+
+    Row(
+        modifier = Modifier
+            .padding(1.dp)
+            .fillMaxWidth(),
+        horizontalArrangement = Arrangement.SpaceEvenly
+    ) {
+        TextButton(
+            onClick = {
+                startReadingState = "Started Reading"
+                startReadingEnabled = !startReadingEnabled
+            },
+            enabled = startReadingEnabled
+        ) {
+            Text(
+                text = startReadingState,
+                style = MaterialTheme.typography.titleMedium,
+                color = if (startReadingEnabled) MaterialTheme.colorScheme.primary
+                else Color.Red.copy(alpha = 0.4f),
+                fontWeight = FontWeight.Bold,
+                maxLines = 1,
+            )
+        }
+        TextButton(
+            onClick = {
+                finishReadingState = "Finished Reading"
+                finishReadingEnabled = !finishReadingEnabled
+            },
+            enabled = finishReadingEnabled
+        ) {
+            Text(
+                text = finishReadingState,
+                style = MaterialTheme.typography.titleMedium,
+                color = if (finishReadingEnabled) MaterialTheme.colorScheme.primary
+                else Color.Red.copy(alpha = 0.4f),
+                fontWeight = FontWeight.Bold,
+                maxLines = 1,
+            )
         }
     }
 }
