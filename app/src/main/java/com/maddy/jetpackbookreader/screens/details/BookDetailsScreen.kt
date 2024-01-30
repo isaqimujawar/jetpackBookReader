@@ -14,7 +14,6 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
-import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Surface
@@ -35,6 +34,7 @@ import androidx.navigation.NavController
 import coil.compose.rememberAsyncImagePainter
 import com.maddy.jetpackbookreader.R
 import com.maddy.jetpackbookreader.components.RoundedButton
+import com.maddy.jetpackbookreader.components.ShowProgressIndicator
 import com.maddy.jetpackbookreader.components.formatHttpText
 import com.maddy.jetpackbookreader.model.Item
 import com.maddy.jetpackbookreader.widgets.ReaderTopAppBar
@@ -76,20 +76,6 @@ fun ShowBookDetails(navController: NavController, viewModel: BookDetailsViewMode
 }
 
 @Composable
-private fun ShowProgressIndicator() {
-    Column(
-        modifier = Modifier
-            .padding(8.dp)
-            .fillMaxSize(),
-        verticalArrangement = Arrangement.Top,
-        horizontalAlignment = Alignment.Start
-    ) {
-        LinearProgressIndicator()
-        Text(text = "Loading book...")
-    }
-}
-
-@Composable
 private fun BookDetails(
     navController: NavController,
     viewModel: BookDetailsViewModel,
@@ -101,7 +87,8 @@ private fun BookDetails(
     Column(
         modifier = Modifier
             .padding(12.dp)
-            .fillMaxSize(),
+            .fillMaxSize()
+            .verticalScroll(rememberScrollState()),
         verticalArrangement = Arrangement.Top,
         horizontalAlignment = Alignment.Start
     ) {
@@ -166,8 +153,7 @@ private fun BookDetails(
             Row(
                 modifier = Modifier
                     .padding(8.dp)
-                    .fillMaxSize()
-                    .verticalScroll(rememberScrollState()),
+                    .fillMaxSize(),
                 horizontalArrangement = Arrangement.Start,
                 verticalAlignment = Alignment.Top
             ) {
