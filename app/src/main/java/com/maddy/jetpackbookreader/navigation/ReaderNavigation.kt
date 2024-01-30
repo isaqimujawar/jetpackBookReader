@@ -11,6 +11,7 @@ import com.maddy.jetpackbookreader.screens.details.BookDetailsScreen
 import com.maddy.jetpackbookreader.screens.details.BookDetailsViewModel
 import com.maddy.jetpackbookreader.screens.home.HomeScreen
 import com.maddy.jetpackbookreader.screens.home.HomeViewModel
+import com.maddy.jetpackbookreader.screens.home.NewHomeViewModel
 import com.maddy.jetpackbookreader.screens.login.CreateAccountScreen
 import com.maddy.jetpackbookreader.screens.login.LoginScreen
 import com.maddy.jetpackbookreader.screens.login.LoginViewModel
@@ -67,7 +68,8 @@ fun ReaderNavigation() {
         ) { navBackStackEntry ->
             navBackStackEntry.arguments?.getString("bookId")?.let { bookId ->
                 val homeViewModel = hiltViewModel<HomeViewModel>()
-                UpdateScreen(navController, homeViewModel, bookId)
+                val newHomeViewModel = hiltViewModel<NewHomeViewModel>()
+                UpdateScreen(navController, homeViewModel, newHomeViewModel, bookId)
             }
         }
         composable(route = ReaderScreens.ReaderStatsScreen.name) {

@@ -5,6 +5,7 @@ import com.maddy.jetpackbookreader.network.BooksApi
 import com.maddy.jetpackbookreader.repository.BookRepository
 import com.maddy.jetpackbookreader.repository.BookRepositoryImpl
 import com.maddy.jetpackbookreader.repository.FireRepository
+import com.maddy.jetpackbookreader.repository.NewFireRepository
 import com.maddy.jetpackbookreader.repository.RemoteBookRepository
 import com.maddy.jetpackbookreader.repository.RemoteBookRepositoryImpl
 import com.maddy.jetpackbookreader.utils.ReaderConstants
@@ -42,4 +43,9 @@ object AppModule {
     @Provides
     fun provideFireRepository() =
         FireRepository(firestoreQuery = FirebaseFirestore.getInstance().collection("books"))
+
+    @Singleton
+    @Provides
+    fun provideNewFireRepository() =
+        NewFireRepository(firestoreQuery = FirebaseFirestore.getInstance().collection("books"))
 }
