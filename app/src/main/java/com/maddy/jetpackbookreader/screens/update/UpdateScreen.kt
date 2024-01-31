@@ -51,6 +51,7 @@ import com.maddy.jetpackbookreader.model.ReadingBook
 import com.maddy.jetpackbookreader.screens.home.HomeViewModel
 import com.maddy.jetpackbookreader.screens.home.NewHomeViewModel
 import com.maddy.jetpackbookreader.utils.getBook
+import com.maddy.jetpackbookreader.widgets.AverageRatingBar
 import com.maddy.jetpackbookreader.widgets.BookRatingBar
 import com.maddy.jetpackbookreader.widgets.ReaderTopAppBar
 
@@ -98,7 +99,7 @@ fun ShowBookUpdate(book: ReadingBook = getBook()) {
         UpdateAndDeleteButton()
         BookImageAndTitle(book)
         StartAndFinishReadingButton()
-        BookRatingBar(text = "Average Rating", rating = averageRating)
+        AverageRatingBar(text = "Average Rating", rating = averageRating)
         BookRatingBar(text = "Your Rating", rating = yourRating)
         EditNoteTextField(book.notes ?: "Book Notes") { note ->
             Log.d("UpdateScreen", "EditNotesTextField: $note ")
