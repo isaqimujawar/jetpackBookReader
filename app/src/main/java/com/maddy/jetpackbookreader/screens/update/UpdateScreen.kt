@@ -45,11 +45,13 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
 import coil.compose.rememberAsyncImagePainter
 import com.maddy.jetpackbookreader.R
+import com.maddy.jetpackbookreader.components.RoundedButton
 import com.maddy.jetpackbookreader.components.ShowProgressIndicator
 import com.maddy.jetpackbookreader.model.ReadingBook
 import com.maddy.jetpackbookreader.screens.home.HomeViewModel
 import com.maddy.jetpackbookreader.screens.home.NewHomeViewModel
 import com.maddy.jetpackbookreader.utils.getBook
+import com.maddy.jetpackbookreader.widgets.BookRatingBar
 import com.maddy.jetpackbookreader.widgets.ReaderTopAppBar
 
 @Composable
@@ -83,6 +85,12 @@ fun UpdateScreen(
 @Preview(showSystemUi = true)
 @Composable
 fun ShowBookUpdate(book: ReadingBook = getBook()) {
+    val averageRating = book.averageRating?.toDouble()?.toInt() ?: 0
+    val yourRating = book.yourRating?.toDouble()?.toInt() ?: 0
+
+    Log.d("ShowBookUpdate", "averageRating: $averageRating")
+    Log.d("ShowBookUpdate", "yourRating: $yourRating")
+
     Column(
         modifier = Modifier
             .fillMaxSize()
@@ -95,57 +103,9 @@ fun ShowBookUpdate(book: ReadingBook = getBook()) {
             Log.d("UpdateScreen", "EditNotesTextField: $note ")
             // TODO("Save the note to the given book")
         }
-        StartAndFinishReadingButtons()
-    }
-}
-
-@Composable
-fun StartAndFinishReadingButtons() {
-    var startReadingState by rememberSaveable { mutableStateOf("Start Reading") }
-    var finishReadingState by rememberSaveable { mutableStateOf("Mark as Read") }
-
-    var startReadingEnabled by rememberSaveable { mutableStateOf(true) }
-    var finishReadingEnabled by rememberSaveable { mutableStateOf(true) }
-
-
-    Row(
-        modifier = Modifier
-            .padding(1.dp)
-            .fillMaxWidth(),
-        horizontalArrangement = Arrangement.SpaceEvenly
-    ) {
-        TextButton(
-            onClick = {
-                startReadingState = "Started Reading"
-                startReadingEnabled = !startReadingEnabled
-            },
-            enabled = startReadingEnabled
-        ) {
-            Text(
-                text = startReadingState,
-                style = MaterialTheme.typography.titleMedium,
-                color = if (startReadingEnabled) MaterialTheme.colorScheme.primary
-                else Color.Red.copy(alpha = 0.4f),
-                fontWeight = FontWeight.Bold,
-                maxLines = 1,
-            )
-        }
-        TextButton(
-            onClick = {
-                finishReadingState = "Finished Reading"
-                finishReadingEnabled = !finishReadingEnabled
-            },
-            enabled = finishReadingEnabled
-        ) {
-            Text(
-                text = finishReadingState,
-                style = MaterialTheme.typography.titleMedium,
-                color = if (finishReadingEnabled) MaterialTheme.colorScheme.primary
-                else Color.Red.copy(alpha = 0.4f),
-                fontWeight = FontWeight.Bold,
-                maxLines = 1,
-            )
-        }
+        StartAndFinishReadingButton()
+        BookRatingBar(text = "Average Rating", rating = averageRating)
+        BookRatingBar(text = "Your Rating", rating = yourRating)
     }
 }
 
@@ -235,4 +195,53 @@ fun EditNoteTextField(note: String, onNoteEdit: (String) -> Unit) {
         ),
         shape = RoundedCornerShape(size = 15.dp),
     )
+}
+
+@Composable
+fun StartAndFinishReadingButton() {
+    var startReadingState by rememberSaveable { mutableStateOf("Start Reading") }
+    var finishReadingState by rememberSaveable { mutableStateOf("Mark as Read") }
+
+    var startReadingEnabled by rememberSaveable { mutableStateOf(true) }
+    var finishReadingEnabled by rememberSaveable { mutableStateOf(true) }
+
+    Row(
+        modifier = Modifier
+            .padding(1.dp)
+            .fillMaxWidth(),
+        horizontalArrangement = Arrangement.SpaceEvenly
+    ) {
+        TextButton(
+            onClick = {
+                startReadingState = "Started Reading"
+                startReadingEnabled = !startReadingEnabled
+            },
+            enabled = startReadingEnabled
+        ) {
+            Text(
+                text = startReadingState,
+                style = MaterialTheme.typography.titleMedium,
+                color = if (startReadingEnabled) MaterialTheme.colorScheme.primary
+                else Color.Red.copy(alpha = 0.4f),
+                fontWeight = FontWeight.Bold,
+                maxLines = 1,
+            )
+        }
+        TextButton(
+            onClick = {
+                finishReadingState = "Finished Reading"
+                finishReadingEnabled = !finishReadingEnabled
+            },
+            enabled = finishReadingEnabled
+        ) {
+            Text(
+                text = finishReadingState,
+                style = MaterialTheme.typography.titleMedium,
+                color = if (finishReadingEnabled) MaterialTheme.colorScheme.primary
+                else Color.Red.copy(alpha = 0.4f),
+                fontWeight = FontWeight.Bold,
+                maxLines = 1,
+            )
+        }
+    }
 }

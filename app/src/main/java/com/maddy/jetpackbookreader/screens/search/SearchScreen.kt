@@ -58,7 +58,7 @@ import com.maddy.jetpackbookreader.widgets.ReaderTopAppBar
 @Composable
 fun SearchScreen(navController: NavController, viewModel: SearchViewModel = hiltViewModel()) {
     val keyboardController = LocalSoftwareKeyboardController.current
-    val searchQueryState = rememberSaveable { mutableStateOf("Cooking") }
+    val searchQueryState = rememberSaveable { mutableStateOf("Habits") }
 
     Scaffold(
         topBar = {
@@ -182,7 +182,7 @@ fun NewBookCard(book: Item, onClick: (String) -> Unit = {}) {
                     overflow = TextOverflow.Ellipsis
                 )
                 Text(
-                    text = "Date: ${book.volumeInfo?.publishedDate}",
+                    text = "Date: ${book.volumeInfo?.publishedDate}, Rating: ${book.volumeInfo?.averageRating ?: "N/A"}",
                     style = MaterialTheme.typography.labelMedium,
                     color = MaterialTheme.colorScheme.onSurfaceVariant,
                     fontStyle = FontStyle.Italic,

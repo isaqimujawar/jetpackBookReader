@@ -23,7 +23,8 @@ data class ReadingBook(
     @set:PropertyName("published_date")
     var publishedDate: String? = null,
 
-    var rating: String? = null,
+    var yourRating: String? = null,
+    var averageRating: String? = null,
 
     var description: String? = null,
 

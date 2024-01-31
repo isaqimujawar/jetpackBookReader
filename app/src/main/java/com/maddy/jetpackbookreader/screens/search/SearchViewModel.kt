@@ -35,8 +35,8 @@ class SearchViewModel @Inject constructor(
     }
 
     private fun loadBooks() {
-        getBooks("cooking")
-        // searchBooks(query = "bodybuilding")
+        getBooks("Habits")
+        // searchBooks(query = "Habits")
     }
 
     fun getBooks(query: String) {

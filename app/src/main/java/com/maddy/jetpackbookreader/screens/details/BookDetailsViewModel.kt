@@ -62,6 +62,9 @@ class BookDetailsViewModel @Inject constructor(
 
     private fun createBook(bookItem: Item): ReadingBook {
         val volumeInfo = bookItem.volumeInfo
+        val averageRating = if (volumeInfo?.averageRating == null) "0.0" else volumeInfo.averageRating.toString()
+        val yourRating = "0.0"
+
         return ReadingBook(
             title = volumeInfo?.title.toString(),
             authors = volumeInfo?.authors.toString(),
@@ -69,7 +72,8 @@ class BookDetailsViewModel @Inject constructor(
             photoUrl = volumeInfo?.imageLinks?.thumbnail.toString(),
             categories = volumeInfo?.categories.toString(),
             publishedDate = volumeInfo?.publishedDate.toString(),
-            rating = 0.0.toString(),
+            yourRating = yourRating,
+            averageRating = averageRating,
             description = volumeInfo?.description.toString(),
             pageCount = volumeInfo?.pageCount.toString(),
             userId = FirebaseAuth.getInstance().currentUser?.uid.toString(),

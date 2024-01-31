@@ -36,6 +36,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
@@ -180,7 +181,7 @@ fun BookCard(book: ReadingBook, onClick: (String?) -> Unit = {}) {
         elevation = CardDefaults.cardElevation(6.dp),
     ) {
         Column {
-            BookImageAndRating(imageUrl = book.photoUrl, rating = book.rating)
+            BookImageAndRating(imageUrl = book.photoUrl, rating = book.averageRating ?: "N/A")
             BookTitleAndAuthor(book.title, book.authors)
             Row(
                 modifier = Modifier.fillMaxWidth(),
@@ -194,7 +195,7 @@ fun BookCard(book: ReadingBook, onClick: (String?) -> Unit = {}) {
 }
 
 @Composable
-private fun BookImageAndRating(imageUrl: String?, rating: String?) {
+private fun BookImageAndRating(imageUrl: String?, rating: String) {
     val photoUrl = imageUrl ?: stringResource(R.string.stock_image_unsplash_url)
 
     Row(
@@ -212,7 +213,7 @@ private fun BookImageAndRating(imageUrl: String?, rating: String?) {
                 .fillMaxHeight(),
             contentScale = ContentScale.Crop
         )
-        BookRating(rating ?: "4.0")
+        BookRating(rating)
     }
 }
 
@@ -240,7 +241,8 @@ fun BookRating(rating: String) {
             ) {
                 Icon(
                     imageVector = Icons.Rounded.Star,
-                    contentDescription = stringResource(R.string.star_icon)
+                    contentDescription = stringResource(R.string.star_icon),
+                    tint = Color(0xFFFFD700)
                 )
                 Text(
                     text = rating, style = MaterialTheme.typography.headlineSmall
