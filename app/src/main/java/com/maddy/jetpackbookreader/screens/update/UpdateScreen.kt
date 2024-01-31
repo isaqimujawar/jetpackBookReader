@@ -88,9 +88,6 @@ fun ShowBookUpdate(book: ReadingBook = getBook()) {
     val averageRating = book.averageRating?.toDouble()?.toInt() ?: 0
     val yourRating = book.yourRating?.toDouble()?.toInt() ?: 0
 
-    Log.d("ShowBookUpdate", "averageRating: $averageRating")
-    Log.d("ShowBookUpdate", "yourRating: $yourRating")
-
     Column(
         modifier = Modifier
             .fillMaxSize()
@@ -98,15 +95,29 @@ fun ShowBookUpdate(book: ReadingBook = getBook()) {
         verticalArrangement = Arrangement.Top,
         horizontalAlignment = Alignment.Start
     ) {
+        UpdateAndDeleteButton()
         BookImageAndTitle(book)
+        StartAndFinishReadingButton()
+        BookRatingBar(text = "Average Rating", rating = averageRating)
+        BookRatingBar(text = "Your Rating", rating = yourRating)
         EditNoteTextField(book.notes ?: "Book Notes") { note ->
             Log.d("UpdateScreen", "EditNotesTextField: $note ")
             // TODO("Save the note to the given book")
         }
-        StartAndFinishReadingButton()
-        BookRatingBar(text = "Average Rating", rating = averageRating)
-        BookRatingBar(text = "Your Rating", rating = yourRating)
-        UpdateAndDeleteButton()
+    }
+}
+
+@Composable
+fun UpdateAndDeleteButton() {
+    Row(
+        modifier = Modifier
+            .padding(12.dp)
+            .fillMaxWidth(),
+        horizontalArrangement = Arrangement.SpaceEvenly,
+        verticalAlignment = Alignment.CenterVertically
+    ) {
+        RoundedButton(text = "Update")
+        RoundedButton(text = "Delete")
     }
 }
 
@@ -244,19 +255,5 @@ fun StartAndFinishReadingButton() {
                 maxLines = 1,
             )
         }
-    }
-}
-
-@Composable
-fun UpdateAndDeleteButton() {
-    Row(
-        modifier = Modifier
-            .padding(12.dp)
-            .fillMaxWidth(),
-        horizontalArrangement = Arrangement.SpaceEvenly,
-        verticalAlignment = Alignment.CenterVertically
-    ) {
-        RoundedButton(text = "Update")
-        RoundedButton(text = "Delete")
     }
 }
