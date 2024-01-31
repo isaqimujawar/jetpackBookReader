@@ -106,6 +106,7 @@ fun ShowBookUpdate(book: ReadingBook = getBook()) {
         StartAndFinishReadingButton()
         BookRatingBar(text = "Average Rating", rating = averageRating)
         BookRatingBar(text = "Your Rating", rating = yourRating)
+        UpdateAndDeleteButton()
     }
 }
 
@@ -243,5 +244,19 @@ fun StartAndFinishReadingButton() {
                 maxLines = 1,
             )
         }
+    }
+}
+
+@Composable
+fun UpdateAndDeleteButton() {
+    Row(
+        modifier = Modifier
+            .padding(12.dp)
+            .fillMaxWidth(),
+        horizontalArrangement = Arrangement.SpaceEvenly,
+        verticalAlignment = Alignment.CenterVertically
+    ) {
+        RoundedButton(text = "Update")
+        RoundedButton(text = "Delete")
     }
 }
