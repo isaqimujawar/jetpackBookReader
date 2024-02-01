@@ -57,7 +57,8 @@ import com.maddy.jetpackbookreader.widgets.HomeTopAppBar
 
 @Composable
 fun HomeScreen(
-    navController: NavController, viewModel: HomeViewModel = hiltViewModel()
+    navController: NavController,
+    viewModel: HomeViewModel = hiltViewModel()
 ) {
 
 

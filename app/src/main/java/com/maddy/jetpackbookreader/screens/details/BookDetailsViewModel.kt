@@ -68,7 +68,7 @@ class BookDetailsViewModel @Inject constructor(
         return ReadingBook(
             title = volumeInfo?.title.toString(),
             authors = volumeInfo?.authors.toString(),
-            notes = "",
+            notes = listOf("note 1", "note 2", "note 3"),
             photoUrl = volumeInfo?.imageLinks?.thumbnail.toString(),
             categories = volumeInfo?.categories.toString(),
             publishedDate = volumeInfo?.publishedDate.toString(),

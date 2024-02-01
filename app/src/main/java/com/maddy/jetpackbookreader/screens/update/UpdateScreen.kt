@@ -18,12 +18,12 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
+import androidx.compose.material3.Button
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -33,24 +33,27 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.style.TextOverflow
+import androidx.compose.ui.tooling.preview.Devices
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
 import coil.compose.rememberAsyncImagePainter
 import com.maddy.jetpackbookreader.R
+import com.maddy.jetpackbookreader.components.NoteRow
 import com.maddy.jetpackbookreader.components.RoundedButton
 import com.maddy.jetpackbookreader.components.ShowProgressIndicator
 import com.maddy.jetpackbookreader.model.ReadingBook
 import com.maddy.jetpackbookreader.navigation.ReaderScreens
 import com.maddy.jetpackbookreader.screens.home.HomeViewModel
 import com.maddy.jetpackbookreader.screens.home.NewHomeViewModel
+import com.maddy.jetpackbookreader.ui.theme.JetpackBookReaderTheme
 import com.maddy.jetpackbookreader.utils.getBook
 import com.maddy.jetpackbookreader.widgets.AverageRatingBar
 import com.maddy.jetpackbookreader.widgets.BookRatingBar
@@ -103,10 +106,11 @@ fun ShowBookUpdate(navController: NavController, book: ReadingBook = getBook()) 
         BookRatingBar(text = "Your Rating", rating = yourRating)
         StartReadingCard()
         FinishReadingCard()
-        EditNoteTextField(book.notes ?: "Book Notes") { note ->
+        EditNoteTextField { note ->
             Log.d("UpdateScreen", "EditNotesTextField: $note ")
             // TODO("Save the note to the given book")
         }
+        NoteList(notes = book.notes ?: listOf("dummy note 1", "dummy note 2", "dummy note 3"))
     }
 }
 
@@ -191,7 +195,7 @@ fun StartReadingCard() {
 
     Surface(
         modifier = Modifier
-            .padding(4.dp)
+            .padding(horizontal = 8.dp, vertical = 16.dp)
             .clip(RoundedCornerShape(topEnd = 33.dp, bottomStart = 33.dp))
             .fillMaxWidth(),
         color = MaterialTheme.colorScheme.surface,
@@ -199,48 +203,47 @@ fun StartReadingCard() {
         tonalElevation = 4.dp,
         shadowElevation = 6.dp,
     ) {
-        Column(
+        Row(
             modifier = Modifier
-                .padding(horizontal = 12.dp, vertical = 6.dp)
-                .clickable {},
-            horizontalAlignment = Alignment.Start
+                .padding(horizontal = 12.dp, vertical = 16.dp)
+                .fillMaxWidth(),
+            horizontalArrangement = Arrangement.SpaceBetween,
+            verticalAlignment = Alignment.CenterVertically
         ) {
-            Row(
-                modifier = Modifier
-                    .padding(1.dp)
-                    .fillMaxWidth(),
-                horizontalArrangement = Arrangement.SpaceEvenly
-            ) {
-                TextButton(
-                    onClick = {
-                        startReadingState = "Started Reading"
-                        startReadingEnabled = !startReadingEnabled
-                    },
-                    enabled = startReadingEnabled
-                ) {
-                    Text(
-                        text = startReadingState,
-                        style = MaterialTheme.typography.titleMedium,
-                        color = if (startReadingEnabled) MaterialTheme.colorScheme.primary
-                        else Color.Red.copy(alpha = 0.4f),
-                        fontWeight = FontWeight.Bold,
-                        maxLines = 1,
-                    )
-                }
-            }
-            Text(text = " card title", style = MaterialTheme.typography.titleMedium)
-            Text(text = " card description", style = MaterialTheme.typography.bodyMedium)
-            Surface(
-                modifier = Modifier
-                    .clip(CircleShape),
-                color = MaterialTheme.colorScheme.secondaryContainer,
+            Button(
+                onClick = {
+                    startReadingState = "Start Reading"
+                    startReadingEnabled = !startReadingEnabled
+                },
+                enabled = startReadingEnabled
             ) {
                 Text(
-                    text = "card date",
-                    style = MaterialTheme.typography.labelSmall,
-                    color = MaterialTheme.colorScheme.tertiary,
-                    modifier = Modifier.padding(horizontal = 12.dp, vertical = 4.dp)
+                    text = startReadingState,
+                    style = MaterialTheme.typography.titleMedium,
+                    color = MaterialTheme.colorScheme.onPrimary,
+                    fontWeight = FontWeight.Bold,
+                    maxLines = 1,
                 )
+            }
+
+            Column(
+                modifier = Modifier
+                    .clickable {},
+                horizontalAlignment = Alignment.Start
+            ) {
+                Text(text = "Started Reading on", style = MaterialTheme.typography.titleMedium)
+                Surface(
+                    modifier = Modifier
+                        .clip(CircleShape),
+                    color = MaterialTheme.colorScheme.secondaryContainer,
+                ) {
+                    Text(
+                        text = "start date",
+                        style = MaterialTheme.typography.labelSmall,
+                        color = MaterialTheme.colorScheme.tertiary,
+                        modifier = Modifier.padding(horizontal = 12.dp, vertical = 4.dp)
+                    )
+                }
             }
         }
     }
@@ -261,48 +264,47 @@ fun FinishReadingCard() {
         tonalElevation = 4.dp,
         shadowElevation = 6.dp,
     ) {
-        Column(
+        Row(
             modifier = Modifier
-                .padding(horizontal = 12.dp, vertical = 6.dp)
-                .clickable {},
-            horizontalAlignment = Alignment.Start
+                .padding(horizontal = 12.dp, vertical = 16.dp)
+                .fillMaxWidth(),
+            horizontalArrangement = Arrangement.SpaceEvenly
         ) {
-            Row(
-                modifier = Modifier
-                    .padding(1.dp)
-                    .fillMaxWidth(),
-                horizontalArrangement = Arrangement.SpaceEvenly
-            ) {
-                TextButton(
-                    onClick = {
-                        finishReadingState = "Finished Reading"
-                        finishReadingEnabled = !finishReadingEnabled
-                    },
-                    enabled = finishReadingEnabled
-                ) {
-                    Text(
-                        text = finishReadingState,
-                        style = MaterialTheme.typography.titleMedium,
-                        color = if (finishReadingEnabled) MaterialTheme.colorScheme.primary
-                        else Color.Red.copy(alpha = 0.4f),
-                        fontWeight = FontWeight.Bold,
-                        maxLines = 1,
-                    )
-                }
-            }
-            Text(text = " card title", style = MaterialTheme.typography.titleMedium)
-            Text(text = " card description", style = MaterialTheme.typography.bodyMedium)
-            Surface(
-                modifier = Modifier
-                    .clip(CircleShape),
-                color = MaterialTheme.colorScheme.secondaryContainer,
+            Button(
+                onClick = {
+                    finishReadingState = "Mark as Read"
+                    finishReadingEnabled = !finishReadingEnabled
+                },
+                enabled = finishReadingEnabled
             ) {
                 Text(
-                    text = "card date",
-                    style = MaterialTheme.typography.labelSmall,
-                    color = MaterialTheme.colorScheme.tertiary,
-                    modifier = Modifier.padding(horizontal = 12.dp, vertical = 4.dp)
+                    text = finishReadingState,
+                    style = MaterialTheme.typography.titleMedium,
+                    color = MaterialTheme.colorScheme.onPrimary,
+                    fontWeight = FontWeight.Bold,
+                    maxLines = 1,
                 )
+            }
+
+            Column(
+                modifier = Modifier
+                    .clickable {},
+                horizontalAlignment = Alignment.Start
+            ) {
+
+                Text(text = "Finished Reading on:", style = MaterialTheme.typography.titleMedium)
+                Surface(
+                    modifier = Modifier
+                        .clip(CircleShape),
+                    color = MaterialTheme.colorScheme.secondaryContainer,
+                ) {
+                    Text(
+                        text = "finish date: ",
+                        style = MaterialTheme.typography.labelSmall,
+                        color = MaterialTheme.colorScheme.tertiary,
+                        modifier = Modifier.padding(horizontal = 12.dp, vertical = 4.dp)
+                    )
+                }
             }
         }
     }
@@ -310,8 +312,8 @@ fun FinishReadingCard() {
 
 @OptIn(ExperimentalComposeUiApi::class)
 @Composable
-fun EditNoteTextField(note: String, onNoteEdit: (String) -> Unit) {
-    var noteState by rememberSaveable { mutableStateOf(note) }
+fun EditNoteTextField(onNoteEdit: (String) -> Unit) {
+    var noteState by rememberSaveable { mutableStateOf("") }
     val keyboardController = LocalSoftwareKeyboardController.current
 
     OutlinedTextField(
@@ -337,4 +339,21 @@ fun EditNoteTextField(note: String, onNoteEdit: (String) -> Unit) {
         ),
         shape = RoundedCornerShape(size = 15.dp),
     )
+}
+
+@Composable
+fun NoteList(notes: List<String>) {
+    for (i in 1..10){
+        NoteRow()
+    }
+}
+
+@Preview(name = "Phone", showSystemUi = true)
+@Preview(name = "Tablet", device = Devices.TABLET, showSystemUi = true)
+@Composable
+fun UpdateScreenPreview() {
+// You can use some sample data to preview your composable without the need to construct the ViewModel
+    JetpackBookReaderTheme {
+        StartReadingCard()
+    }
 }

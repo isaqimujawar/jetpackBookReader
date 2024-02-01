@@ -6,7 +6,7 @@ fun getBook(
     id: String = "1",
     title: String = "Atomic Habits",
     authors: String = "James Clear",
-    notes: String = "Tiny Habits need to be established first before expanding."
+    notes: List<String> = listOf("Tiny Habits need to be established first before expanding.")
 ) = ReadingBook(id, title, authors, notes)
 
 

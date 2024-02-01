@@ -4,10 +4,10 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
@@ -66,7 +66,37 @@ fun ShowProgressIndicator() {
         verticalArrangement = Arrangement.Top,
         horizontalAlignment = Alignment.Start
     ) {
-        LinearProgressIndicator()
+        // LinearProgressIndicator()
         Text(text = "Loading book...")
     }
+}
+
+@Composable
+fun NoteRow(
+    modifier: Modifier = Modifier,
+    note: String = "dummy note 1",
+    onNoteClicked: (String) -> Unit = {},
+) {
+    Surface(
+        modifier = modifier
+            .padding(4.dp)
+            .clip(RoundedCornerShape(topEnd = 33.dp, bottomStart = 33.dp))
+            .fillMaxWidth(),
+        color = MaterialTheme.colorScheme.surface,
+        contentColor = MaterialTheme.colorScheme.onSurface,
+        tonalElevation = 4.dp,
+        shadowElevation = 6.dp,
+    ) {
+        Column(
+            modifier = Modifier
+                .padding(horizontal = 12.dp, vertical = 6.dp)
+                .clickable {
+                    onNoteClicked(note)
+                },
+            horizontalAlignment = Alignment.Start
+        ) {
+            Text(text = note, style = MaterialTheme.typography.titleMedium)
+        }
+    }
+
 }

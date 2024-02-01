@@ -1,5 +1,6 @@
 package com.maddy.jetpackbookreader.screens.home
 
+import android.util.Log
 import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -24,6 +25,7 @@ class HomeViewModel @Inject constructor(private val repository: FireRepository) 
     fun getAllBooks() {
         viewModelScope.launch(Dispatchers.Default) {
             books.value = repository.getAllBooks()
+            Log.d("HomeViewModel", "getAllBooks: ${books.value.data}")
         }
     }
 

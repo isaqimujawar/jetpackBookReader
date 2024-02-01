@@ -11,7 +11,7 @@ data class ReadingBook(
 
     var authors: String? = null,
 
-    var notes: String? = null,
+    var notes: List<String>? = null,
 
     @get:PropertyName("book_photo_url")
     @set:PropertyName("book_photo_url")
