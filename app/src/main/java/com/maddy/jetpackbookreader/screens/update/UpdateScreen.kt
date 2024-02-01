@@ -2,6 +2,7 @@ package com.maddy.jetpackbookreader.screens.update
 
 import android.util.Log
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -39,7 +40,6 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.style.TextOverflow
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
@@ -48,6 +48,7 @@ import com.maddy.jetpackbookreader.R
 import com.maddy.jetpackbookreader.components.RoundedButton
 import com.maddy.jetpackbookreader.components.ShowProgressIndicator
 import com.maddy.jetpackbookreader.model.ReadingBook
+import com.maddy.jetpackbookreader.navigation.ReaderScreens
 import com.maddy.jetpackbookreader.screens.home.HomeViewModel
 import com.maddy.jetpackbookreader.screens.home.NewHomeViewModel
 import com.maddy.jetpackbookreader.utils.getBook
@@ -78,15 +79,14 @@ fun UpdateScreen(
                 .fillMaxSize()
         ) {
             if (book.title.isNullOrEmpty()) ShowProgressIndicator()
-            else ShowBookUpdate(book)
+            else ShowBookUpdate(navController, book)
         }
     }
 }
 
-@Preview(showSystemUi = true)
 @Composable
-fun ShowBookUpdate(book: ReadingBook = getBook()) {
-    val averageRating = book.averageRating?.toDouble()?.toInt() ?: 0
+fun ShowBookUpdate(navController: NavController, book: ReadingBook = getBook()) {
+
     val yourRating = book.yourRating?.toDouble()?.toInt() ?: 0
 
     Column(
@@ -96,10 +96,12 @@ fun ShowBookUpdate(book: ReadingBook = getBook()) {
         verticalArrangement = Arrangement.Top,
         horizontalAlignment = Alignment.Start
     ) {
-        UpdateAndDeleteButton()
-        BookImageAndTitle(book)
+        UpdateAndDeleteButton(book)
+        BookImageAndTitle(book) {
+            navController.navigate(ReaderScreens.BookDetailsScreen.name + "/${book.googleBookId}")
+        }
         StartAndFinishReadingButton()
-        AverageRatingBar(text = "Average Rating", rating = averageRating)
+
         BookRatingBar(text = "Your Rating", rating = yourRating)
         EditNoteTextField(book.notes ?: "Book Notes") { note ->
             Log.d("UpdateScreen", "EditNotesTextField: $note ")
@@ -109,7 +111,7 @@ fun ShowBookUpdate(book: ReadingBook = getBook()) {
 }
 
 @Composable
-fun UpdateAndDeleteButton() {
+fun UpdateAndDeleteButton(book: ReadingBook) {
     Row(
         modifier = Modifier
             .padding(12.dp)
@@ -123,13 +125,15 @@ fun UpdateAndDeleteButton() {
 }
 
 @Composable
-private fun BookImageAndTitle(book: ReadingBook) {
+private fun BookImageAndTitle(book: ReadingBook, onClick: () -> Unit = {}) {
     val photoUrl = book.photoUrl ?: stringResource(R.string.stock_image_unsplash_url)
+    val averageRating = book.averageRating?.toDouble()?.toInt() ?: 0
 
     Surface(
         modifier = Modifier
             .padding(horizontal = 12.dp, vertical = 16.dp)
-            .fillMaxWidth(),
+            .fillMaxWidth()
+            .clickable { onClick.invoke() },
         shape = CircleShape,
         shadowElevation = 4.dp,
         tonalElevation = 4.dp
@@ -173,9 +177,9 @@ private fun BookImageAndTitle(book: ReadingBook) {
                     maxLines = 1,
                     overflow = TextOverflow.Ellipsis
                 )
+                AverageRatingBar(rating = averageRating)
             }
         }
-
     }
 }
 

@@ -36,4 +36,5 @@
     <string name="update_book">Update Book</string>
     <string name="your_notes">Add your notes and thoughts about the book.</string>
     <string name="enter_your_thoughts">Enter Your Thoughts</string>
+    <string name="rating">Rating</string>
 </resources>

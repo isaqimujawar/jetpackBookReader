@@ -37,6 +37,8 @@ import com.maddy.jetpackbookreader.components.RoundedButton
 import com.maddy.jetpackbookreader.components.ShowProgressIndicator
 import com.maddy.jetpackbookreader.components.formatHttpText
 import com.maddy.jetpackbookreader.model.Item
+import com.maddy.jetpackbookreader.model.VolumeInfo
+import com.maddy.jetpackbookreader.widgets.AverageRatingBar
 import com.maddy.jetpackbookreader.widgets.ReaderTopAppBar
 
 @Composable
@@ -69,7 +71,7 @@ fun BookDetailsScreen(
 fun ShowBookDetails(navController: NavController, viewModel: BookDetailsViewModel) {
     val bookItem = viewModel.bookItem.collectAsStateWithLifecycle().value
 
-    if (bookItem != null)
+    if (bookItem.id != null)
         BookDetails(navController, viewModel, bookItem)
     else
         ShowProgressIndicator()
@@ -92,49 +94,82 @@ private fun BookDetails(
         verticalArrangement = Arrangement.Top,
         horizontalAlignment = Alignment.Start
     ) {
-        Row(
-            modifier = Modifier
-                .padding(bottom = 8.dp)
-                .fillMaxWidth(),
-            horizontalArrangement = Arrangement.SpaceEvenly,
-            verticalAlignment = Alignment.CenterVertically
-        ) {
-            Image(
-                painter = rememberAsyncImagePainter(model = volumeInfo?.imageLinks?.thumbnail),
-                contentDescription = stringResource(R.string.book_image),
-                contentScale = ContentScale.Fit,
-                modifier = Modifier
-                    .size(150.dp)
-                    .clip(RoundedCornerShape(16.dp))
-            )
-            Column(
-                modifier = Modifier.height(120.dp),
-                verticalArrangement = Arrangement.SpaceBetween,
-                horizontalAlignment = Alignment.CenterHorizontally
-            ) {
-                RoundedButton(text = "Save") {
-                    // Save book to Firestore
-                    viewModel.saveToFirebase(bookItem) {
-                        Toast.makeText(context, "Book Saved", Toast.LENGTH_SHORT).show()
-                        navController.popBackStack()
-                    }
-                }
-                RoundedButton(text = "Back") {
-                    navController.popBackStack()
-                }
+        ImageAndSaveButton(
+            volumeInfo = volumeInfo,
+            onBackClick = { navController.popBackStack() }) {
+            // Save book to Firestore
+            viewModel.saveToFirebase(bookItem) {
+                Toast.makeText(context, "Book Saved", Toast.LENGTH_SHORT).show()
+                navController.popBackStack()
             }
         }
+        BookDetailsText(volumeInfo)
+        BookDescription(volumeInfo)
+    }
+}
+
+@Composable
+private fun ImageAndSaveButton(
+    volumeInfo: VolumeInfo?,
+    onBackClick: () -> Unit = {},
+    onSaveClick: () -> Unit = {}
+) {
+    Row(
+        modifier = Modifier
+            .padding(bottom = 8.dp)
+            .fillMaxWidth(),
+        horizontalArrangement = Arrangement.SpaceEvenly,
+        verticalAlignment = Alignment.CenterVertically
+    ) {
+        Image(
+            painter = rememberAsyncImagePainter(model = volumeInfo?.imageLinks?.thumbnail),
+            contentDescription = stringResource(R.string.book_image),
+            contentScale = ContentScale.Fit,
+            modifier = Modifier
+                .size(150.dp)
+                .clip(RoundedCornerShape(16.dp))
+        )
+        Column(
+            modifier = Modifier.height(120.dp),
+            verticalArrangement = Arrangement.SpaceBetween,
+            horizontalAlignment = Alignment.CenterHorizontally
+        ) {
+            RoundedButton(text = "Save") { onSaveClick() }
+            RoundedButton(text = "Back") { onBackClick() }
+        }
+    }
+}
+
+@Composable
+private fun BookDetailsText(volumeInfo: VolumeInfo?) {
+    // val averageRatingOld = if (volumeInfo?.averageRating == null) 0 else volumeInfo.averageRating.toInt()
+    val averageRating = volumeInfo?.averageRating?.toInt() ?: 0
+
+    Column(
+        modifier = Modifier.fillMaxWidth(),
+        verticalArrangement = Arrangement.Top,
+        horizontalAlignment = Alignment.Start
+    ) {
         Text(
             text = volumeInfo?.title.toString(),
             style = MaterialTheme.typography.titleLarge,
             color = MaterialTheme.colorScheme.primary,
             fontWeight = FontWeight.SemiBold
         )
+
         Text(
             text = stringResource(R.string.authors) + volumeInfo?.authors.toString(),
             style = MaterialTheme.typography.titleMedium,
             color = MaterialTheme.colorScheme.onSurfaceVariant,
         )
+        Row(verticalAlignment = Alignment.CenterVertically) {
+            Text(
+                text = stringResource(R.string.rating),
+                style = MaterialTheme.typography.titleMedium,
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
+            )
+            AverageRatingBar(rating = averageRating)
+        }
         Text(
             text = stringResource(R.string.categories) + volumeInfo?.categories.toString(),
             style = MaterialTheme.typography.titleMedium,
@@ -147,18 +182,21 @@ private fun BookDetails(
             style = MaterialTheme.typography.titleMedium,
             color = MaterialTheme.colorScheme.onSurfaceVariant,
         )
-        Surface(
-            border = BorderStroke(2.dp, MaterialTheme.colorScheme.onSurface)
-        ) {
-            Row(
-                modifier = Modifier
-                    .padding(8.dp)
-                    .fillMaxSize(),
-                horizontalArrangement = Arrangement.Start,
-                verticalAlignment = Alignment.Top
-            ) {
-                Text(text = formatHttpText(httpText = volumeInfo?.description))
-            }
+    }
+}
+
+@Composable
+private fun BookDescription(volumeInfo: VolumeInfo?) {
+    Row(
+        modifier = Modifier.fillMaxSize(),
+        horizontalArrangement = Arrangement.Start,
+        verticalAlignment = Alignment.Top
+    ) {
+        Surface(border = BorderStroke(2.dp, MaterialTheme.colorScheme.onSurface)) {
+            Text(
+                text = "Description:" + "\n" + formatHttpText(httpText = volumeInfo?.description),
+                modifier = Modifier.padding(8.dp)
+            )
         }
     }
 }
