@@ -25,17 +25,15 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.input.pointer.pointerInteropFilter
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.maddy.jetpackbookreader.R
 
 @OptIn(ExperimentalComposeUiApi::class)
-@Preview
 @Composable
 fun BookRatingBar(
     modifier: Modifier = Modifier,
     text: String = "Rating",
-    rating: Int = 0,
+    rating: Int,
     onClick: (Int) -> Unit = {}
 ) {
     var ratingState by rememberSaveable { mutableStateOf(rating) }
@@ -69,6 +67,7 @@ fun BookRatingBar(
                             MotionEvent.ACTION_DOWN -> {
                                 selectedState = true
                                 ratingState = i
+                                onClick(ratingState)
                             }
 
                             MotionEvent.ACTION_UP -> {

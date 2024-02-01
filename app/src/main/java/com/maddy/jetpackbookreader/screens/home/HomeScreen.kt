@@ -125,9 +125,6 @@ fun HomeContent(
         TitleSection(modifier, displayName) {
             navController.navigate(route = ReaderScreens.ReaderStatsScreen.name)
         }
-        /*BookCard(book = getBook()) {
-            // Todo("Card OnClick impl")
-        }*/
         ReadingBookList(navController, listOfBooks)
         Spacer(modifier = Modifier.height(12.dp))
         TitleText("Reading List")

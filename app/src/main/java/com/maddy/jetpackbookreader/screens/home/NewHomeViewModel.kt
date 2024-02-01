@@ -3,6 +3,7 @@ package com.maddy.jetpackbookreader.screens.home
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.firestore.FirebaseFirestore
 import com.maddy.jetpackbookreader.model.ReadingBook
 import com.maddy.jetpackbookreader.repository.NewFireRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -51,9 +52,20 @@ class NewHomeViewModel @Inject constructor(private val repository: NewFireReposi
         } else emptyList<ReadingBook>()
 
     fun getBookById(bookId: String): ReadingBook {
-        return   if (errorStateFlow.value == null)
+        return if (errorStateFlow.value == null)
             bookListStateFlow.value.firstOrNull { it.id == bookId } ?: ReadingBook()
         else
             ReadingBook()
+    }
+
+    fun updateBook(bookId: String?, newRating: Int, onUpdateComplete: (Boolean) -> Unit) {
+        val bookToUpdate = hashMapOf("your_rating" to newRating.toString()).toMap()
+
+        FirebaseFirestore.getInstance()
+            .collection("books")
+            .document(bookId!!)
+            .update(bookToUpdate)
+            .addOnCompleteListener { onUpdateComplete(true) }
+            .addOnFailureListener { onUpdateComplete(false) }
     }
 }

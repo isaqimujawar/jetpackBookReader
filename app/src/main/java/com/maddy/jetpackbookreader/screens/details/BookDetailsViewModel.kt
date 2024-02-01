@@ -4,6 +4,7 @@ import android.util.Log
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.google.firebase.Timestamp
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
 import com.maddy.jetpackbookreader.model.Item
@@ -100,7 +101,7 @@ class BookDetailsViewModel @Inject constructor(
         return ReadingBook(
             title = volumeInfo?.title.toString(),
             authors = volumeInfo?.authors.toString(),
-            notes = listOf("note 1", "note 2", "note 3"),
+            notes = listOf("Book Saved on ${Timestamp.now().toDate()}"),
             photoUrl = volumeInfo?.imageLinks?.thumbnail.toString(),
             categories = volumeInfo?.categories.toString(),
             publishedDate = volumeInfo?.publishedDate.toString(),

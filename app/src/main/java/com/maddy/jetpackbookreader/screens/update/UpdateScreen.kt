@@ -1,6 +1,7 @@
 package com.maddy.jetpackbookreader.screens.update
 
 import android.util.Log
+import android.widget.Toast
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -25,14 +26,17 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
@@ -82,15 +86,21 @@ fun UpdateScreen(
                 .fillMaxSize()
         ) {
             if (book.title.isNullOrEmpty()) ShowProgressIndicator()
-            else ShowBookUpdate(navController, book)
+            else ShowBookUpdate(navController, newHomeViewModel, book,)
         }
     }
 }
 
 @Composable
-fun ShowBookUpdate(navController: NavController, book: ReadingBook = getBook()) {
-
+fun ShowBookUpdate(
+    navController: NavController,
+    newHomeViewModel: NewHomeViewModel,
+    book: ReadingBook = getBook()
+) {
     val yourRating = book.yourRating?.toDouble()?.toInt() ?: 0
+
+    // variables to check if we need to update
+    val ratingState = remember { mutableStateOf(yourRating) }
 
     Column(
         modifier = Modifier
@@ -99,11 +109,14 @@ fun ShowBookUpdate(navController: NavController, book: ReadingBook = getBook()) 
         verticalArrangement = Arrangement.Top,
         horizontalAlignment = Alignment.Start
     ) {
-        UpdateAndDeleteButton(book)
+        UpdateAndDeleteButton(navController, newHomeViewModel, book, yourRating, ratingState)
         BookImageAndTitle(book) {
             navController.navigate(ReaderScreens.BookDetailsScreen.name + "/${book.googleBookId}")
         }
-        BookRatingBar(text = "Your Rating", rating = yourRating)
+        BookRatingBar(text = "Your Rating", rating = yourRating) { newRating ->
+            ratingState.value = newRating
+            Log.d("TAG", "ShowSimpleForm: ${ratingState.value}")
+        }
         StartReadingCard()
         FinishReadingCard()
         EditNoteTextField { note ->
@@ -115,7 +128,14 @@ fun ShowBookUpdate(navController: NavController, book: ReadingBook = getBook()) 
 }
 
 @Composable
-fun UpdateAndDeleteButton(book: ReadingBook) {
+fun UpdateAndDeleteButton(navController: NavController, newHomeViewModel: NewHomeViewModel, book: ReadingBook, yourRating: Int, ratingState: MutableState<Int>) {
+    val context = LocalContext.current
+
+    val changedRating = yourRating != ratingState.value
+
+    // if true - then will update the book with new changes
+    val bookUpdate = changedRating
+
     Row(
         modifier = Modifier
             .padding(12.dp)
@@ -123,7 +143,22 @@ fun UpdateAndDeleteButton(book: ReadingBook) {
         horizontalArrangement = Arrangement.SpaceEvenly,
         verticalAlignment = Alignment.CenterVertically
     ) {
-        RoundedButton(text = "Update")
+        RoundedButton(text = "Update") {
+            if (bookUpdate) {
+                newHomeViewModel.updateBook(book.id, ratingState.value) { updated ->
+                    if (updated) {
+                        Toast.makeText(context, "Book Updated Succefully", Toast.LENGTH_SHORT).show()
+                        navController.navigate(ReaderScreens.HomeScreen.name) {
+                            popUpTo(navController.graph.id) {
+                                inclusive = true
+                            }
+                        }
+                    } else {
+                        Toast.makeText(context, "Book Update Failed", Toast.LENGTH_SHORT).show()
+                    }
+                }
+            }
+        }
         RoundedButton(text = "Delete")
     }
 }
@@ -343,7 +378,7 @@ fun EditNoteTextField(onNoteEdit: (String) -> Unit) {
 
 @Composable
 fun NoteList(notes: List<String>) {
-    for (i in 1..10){
+    for (i in 1..10) {
         NoteRow()
     }
 }
