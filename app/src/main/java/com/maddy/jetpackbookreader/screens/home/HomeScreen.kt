@@ -58,14 +58,13 @@ import com.maddy.jetpackbookreader.widgets.HomeTopAppBar
 @Composable
 fun HomeScreen(
     navController: NavController,
-    viewModel: HomeViewModel = hiltViewModel()
+    viewModel: HomeViewModel = hiltViewModel(),
+    newHomeViewModel: NewHomeViewModel = hiltViewModel()
 ) {
-
-
     Scaffold(
         topBar = {
             HomeTopAppBar(
-                onRefreshClicked = { viewModel.getAllBooks() }
+                onRefreshClicked = { newHomeViewModel.getAllBooks() }
             ) {
                 viewModel.signOut().run {
                     navController.navigate(route = ReaderScreens.LoginScreen.name) {
@@ -87,7 +86,8 @@ fun HomeScreen(
                 .padding(paddingValues = paddingValues)
                 .fillMaxSize()
         ) {
-            HomeContent(navController, viewModel)
+            // HomeContent(navController, viewModel)
+            HomeContent(navController, newHomeViewModel)
         }
     }
 }
@@ -111,7 +111,7 @@ private fun FABAddBook(onFABClicked: () -> Unit) {
 @Composable
 fun HomeContent(
     navController: NavController,
-    viewModel: HomeViewModel,
+    viewModel: NewHomeViewModel,
     modifier: Modifier = Modifier
 ) {
     val displayName = viewModel.getUserDisplayName()

@@ -43,7 +43,8 @@ fun ReaderNavigation() {
         }
         composable(route = ReaderScreens.HomeScreen.name) {
             val homeViewModel = hiltViewModel<HomeViewModel>()
-            HomeScreen(navController = navController, viewModel = homeViewModel)
+            val newHomeViewModel = hiltViewModel<NewHomeViewModel>()
+            HomeScreen(navController = navController, viewModel = homeViewModel, newHomeViewModel= newHomeViewModel)
         }
         composable(route = ReaderScreens.SearchScreen.name) {
             val searchViewModel = hiltViewModel<SearchViewModel>()

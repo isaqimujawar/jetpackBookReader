@@ -63,6 +63,7 @@ fun BookDetailsScreen(
                 .fillMaxSize()
         ) {
             viewModel.getBookInfo(bookId).run { ShowBookDetails(navController, viewModel) }
+            viewModel.getAllBooks()
         }
     }
 }
@@ -98,9 +99,15 @@ private fun BookDetails(
             volumeInfo = volumeInfo,
             onBackClick = { navController.popBackStack() }) {
             // Save book to Firestore
-            viewModel.saveToFirebase(bookItem) {
-                Toast.makeText(context, "Book Saved", Toast.LENGTH_SHORT).show()
-                navController.popBackStack()
+            viewModel.saveToFirebase(bookItem) { saved ->
+                if (saved){
+                    Toast.makeText(context, "Book Saved", Toast.LENGTH_SHORT).show()
+                    navController.popBackStack()
+                }
+                else {
+                    Toast.makeText(context, "Book Already Exists", Toast.LENGTH_SHORT).show()
+                }
+
             }
         }
         BookDetailsText(volumeInfo)
