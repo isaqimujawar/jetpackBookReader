@@ -104,6 +104,7 @@ fun ShowBookUpdate(
     // variables to check if we need to update
     val updateRatingState = remember { mutableIntStateOf(yourRating) }
     val updateStartReadingState = remember { mutableStateOf(false) }
+    val updateFinishReadingState = remember { mutableStateOf(false) }
 
 
     Column(
@@ -113,7 +114,15 @@ fun ShowBookUpdate(
         verticalArrangement = Arrangement.Top,
         horizontalAlignment = Alignment.Start
     ) {
-        UpdateAndDeleteButton(navController, newHomeViewModel, book, yourRating, updateRatingState, updateStartReadingState)
+        UpdateAndDeleteButton(
+            navController,
+            newHomeViewModel,
+            book,
+            yourRating,
+            updateRatingState,
+            updateStartReadingState,
+            updateFinishReadingState
+        )
         BookImageAndTitle(book) {
             navController.navigate(ReaderScreens.BookDetailsScreen.name + "/${book.googleBookId}")
         }
@@ -122,7 +131,7 @@ fun ShowBookUpdate(
             Log.d("TAG", "ShowSimpleForm: ${updateRatingState.value}")
         }
         StartReadingCard(updateStartReadingState, book)
-        FinishReadingCard()
+        FinishReadingCard(updateFinishReadingState, book)
         EditNoteTextField { note ->
             Log.d("UpdateScreen", "EditNotesTextField: $note ")
             // TODO("Save the note to the given book")
@@ -138,15 +147,18 @@ fun UpdateAndDeleteButton(
     book: ReadingBook,
     yourRating: Int,
     ratingState: MutableState<Int>,
-    updateStartReadingState: MutableState<Boolean>
+    updateStartReadingState: MutableState<Boolean>,
+    updateFinishReadingState: MutableState<Boolean>
 ) {
     val context = LocalContext.current
 
     val changedRating = yourRating != ratingState.value
-    val isStartedTimestamp = if (updateStartReadingState.value) Timestamp.now() else book.startedReading
+    val isStartedTimestamp =
+        if (updateStartReadingState.value) Timestamp.now() else book.startedReading
+    val isFinishedTimestamp = if(updateFinishReadingState.value) Timestamp.now() else book.finishedReading
 
     // if true - then will update the book with new changes
-    val bookUpdate = changedRating || updateStartReadingState.value
+    val bookUpdate = changedRating || updateStartReadingState.value || updateFinishReadingState.value
 
     Row(
         modifier = Modifier
@@ -157,9 +169,15 @@ fun UpdateAndDeleteButton(
     ) {
         RoundedButton(text = "Update") {
             if (bookUpdate) {
-                newHomeViewModel.updateBook(book.id, ratingState.value, isStartedTimestamp) { updated ->
+                newHomeViewModel.updateBook(
+                    book.id,
+                    ratingState.value,
+                    isStartedTimestamp,
+                    isFinishedTimestamp
+                ) { updated ->
                     if (updated) {
-                        Toast.makeText(context, "Book Updated Succefully", Toast.LENGTH_SHORT).show()
+                        Toast.makeText(context, "Book Updated Succefully", Toast.LENGTH_SHORT)
+                            .show()
                         navController.navigate(ReaderScreens.HomeScreen.name) {
                             popUpTo(navController.graph.id) {
                                 inclusive = true
@@ -237,8 +255,9 @@ private fun BookImageAndTitle(book: ReadingBook, onClick: () -> Unit = {}) {
 
 @Composable
 fun StartReadingCard(updateStartReadingState: MutableState<Boolean>, book: ReadingBook) {
-    var startReadingEnabled = if(book.startedReading != null ) remember { mutableStateOf(false) }
+    var startReadingEnabled = if (book.startedReading != null) remember { mutableStateOf(false) }
     else remember { mutableStateOf(true) }
+
     Surface(
         modifier = Modifier
             .padding(horizontal = 8.dp, vertical = 16.dp)
@@ -297,13 +316,13 @@ fun StartReadingCard(updateStartReadingState: MutableState<Boolean>, book: Readi
 }
 
 @Composable
-fun FinishReadingCard() {
-    var finishReadingState by rememberSaveable { mutableStateOf("Mark as Read") }
-    var finishReadingEnabled by rememberSaveable { mutableStateOf(true) }
+fun FinishReadingCard(updateFinishReadingState: MutableState<Boolean>, book: ReadingBook) {
+    var finishReadingEnabled = if (book.finishedReading != null) remember { mutableStateOf(false) }
+    else remember { mutableStateOf(true) }
 
     Surface(
         modifier = Modifier
-            .padding(4.dp)
+            .padding(horizontal = 8.dp, vertical = 16.dp)
             .clip(RoundedCornerShape(topEnd = 33.dp, bottomStart = 33.dp))
             .fillMaxWidth(),
         color = MaterialTheme.colorScheme.surface,
@@ -315,17 +334,18 @@ fun FinishReadingCard() {
             modifier = Modifier
                 .padding(horizontal = 12.dp, vertical = 16.dp)
                 .fillMaxWidth(),
-            horizontalArrangement = Arrangement.SpaceEvenly
+            horizontalArrangement = Arrangement.SpaceBetween,
+            verticalAlignment = Alignment.CenterVertically
         ) {
             Button(
                 onClick = {
-                    finishReadingState = "Mark as Read"
-                    finishReadingEnabled = !finishReadingEnabled
+                    finishReadingEnabled.value = !finishReadingEnabled.value
+                    updateFinishReadingState.value = true
                 },
-                enabled = finishReadingEnabled
+                enabled = finishReadingEnabled.value
             ) {
                 Text(
-                    text = finishReadingState,
+                    text = "Mark as Read",
                     style = MaterialTheme.typography.titleMedium,
                     color = MaterialTheme.colorScheme.onPrimary,
                     fontWeight = FontWeight.Bold,
@@ -346,7 +366,7 @@ fun FinishReadingCard() {
                     color = MaterialTheme.colorScheme.secondaryContainer,
                 ) {
                     Text(
-                        text = "finish date: ",
+                        text = "${book.finishedReading?.toDate() ?: "finish date"}",
                         style = MaterialTheme.typography.labelSmall,
                         color = MaterialTheme.colorScheme.tertiary,
                         modifier = Modifier.padding(horizontal = 12.dp, vertical = 4.dp)
@@ -399,7 +419,7 @@ fun NoteList(notes: List<String>) {
         }
     }*/
 
-    for(element in notes) {
+    for (element in notes) {
         NoteRow(note = element)
     }
 }

@@ -63,11 +63,13 @@ class NewHomeViewModel @Inject constructor(private val repository: NewFireReposi
         bookId: String?,
         newRating: Int,
         isStartedTimestamp: Timestamp?,
+        isFinishedTimestamp: Timestamp?,
         onUpdateComplete: (Boolean) -> Unit
     ) {
         val bookToUpdate = hashMapOf(
             "your_rating" to newRating.toString(),
-            "started_reading_at" to isStartedTimestamp
+            "started_reading_at" to isStartedTimestamp,
+            "finished_reading_at" to isFinishedTimestamp
         ).toMap()
 
         FirebaseFirestore.getInstance()
