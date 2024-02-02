@@ -48,6 +48,7 @@ import androidx.navigation.NavController
 import coil.compose.rememberAsyncImagePainter
 import com.maddy.jetpackbookreader.R
 import com.maddy.jetpackbookreader.components.RoundedButton
+import com.maddy.jetpackbookreader.components.ShowProgressIndicator
 import com.maddy.jetpackbookreader.components.TitleText
 import com.maddy.jetpackbookreader.model.ReadingBook
 import com.maddy.jetpackbookreader.navigation.ReaderScreens
@@ -116,6 +117,18 @@ fun HomeContent(
 ) {
     val displayName = viewModel.getUserDisplayName()
     val listOfBooks: List<ReadingBook> = viewModel.getReadingBookList()
+
+    if (listOfBooks.isEmpty()) ShowProgressIndicator()
+    else ShowHomeScreen(modifier, displayName, navController, listOfBooks)
+}
+
+@Composable
+private fun ShowHomeScreen(
+    modifier: Modifier,
+    displayName: String,
+    navController: NavController,
+    listOfBooks: List<ReadingBook>
+) {
     Column(
         modifier = modifier
             .padding(8.dp)

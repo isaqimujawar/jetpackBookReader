@@ -98,14 +98,14 @@ fun ShowBookUpdate(
     book: ReadingBook = getBook()
 ) {
     val yourRating = book.yourRating?.toDouble()?.toInt() ?: 0
-    val ratingState = remember { mutableIntStateOf(yourRating) }
+    val ratingState = rememberSaveable { mutableIntStateOf(yourRating) }
     val noteState = rememberSaveable { mutableStateOf("") }
 
     // variables to check if we need to update
-    val updateRatingState = remember { mutableStateOf(false) }
-    val updateStartReadingState = remember { mutableStateOf(false) }
-    val updateFinishReadingState = remember { mutableStateOf(false) }
-    val updateNoteState = remember { mutableStateOf(false) }
+    val updateRatingState = rememberSaveable { mutableStateOf(false) }
+    val updateStartReadingState = rememberSaveable { mutableStateOf(false) }
+    val updateFinishReadingState = rememberSaveable { mutableStateOf(false) }
+    val updateNoteState = rememberSaveable { mutableStateOf(false) }
 
     Column(
         modifier = Modifier
