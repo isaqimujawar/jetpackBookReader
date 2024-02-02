@@ -59,21 +59,44 @@ class NewHomeViewModel @Inject constructor(private val repository: NewFireReposi
             ReadingBook()
     }
 
-    fun updateBook(
+    fun updateBookInDatabase(
+        book: ReadingBook,
         bookId: String?,
-        newRating: Int,
-        isStartedTimestamp: Timestamp?,
-        isFinishedTimestamp: Timestamp?,
-        newNotes: List<String>?,
+        rating: Int,
+        note: String,
+        updateRating: Boolean,
+        updateStartReading: Boolean,
+        updateFinishReading: Boolean,
+        updateNotes: Boolean,
         onUpdateComplete: (Boolean) -> Unit
     ) {
-        val bookToUpdate = hashMapOf(
-            "your_rating" to newRating.toString(),
-            "started_reading_at" to isStartedTimestamp,
-            "finished_reading_at" to isFinishedTimestamp,
-            "notes" to newNotes ,
-        ).toMap()
+        if (updateRating) {
+            val bookToUpdate = hashMapOf("your_rating" to rating.toString()).toMap()
+            firebaseUpdate(bookId, bookToUpdate) { onUpdateComplete(it) }
+        }
+        if (updateStartReading) {
+            val bookToUpdate = hashMapOf("started_reading_at" to Timestamp.now()).toMap()
+            firebaseUpdate(bookId, bookToUpdate) { onUpdateComplete(it) }
+        }
+        if (updateFinishReading) {
+            val bookToUpdate = hashMapOf("finished_reading_at" to Timestamp.now()).toMap()
+            firebaseUpdate(bookId, bookToUpdate) { onUpdateComplete(it) }
+        }
+        if (updateNotes) {
+            val mutableNotes = book.notes?.toMutableList() ?: mutableListOf()
+            mutableNotes.add(0, note)
+            val newNotes: List<String>? = mutableNotes
 
+            val bookToUpdate = hashMapOf("notes" to newNotes).toMap()
+            firebaseUpdate(bookId, bookToUpdate) { onUpdateComplete(it) }
+        }
+    }
+
+    private fun firebaseUpdate(
+        bookId: String?,
+        bookToUpdate: Map<String, Any?>,
+        onUpdateComplete: (Boolean) -> Unit
+    ) {
         FirebaseFirestore.getInstance()
             .collection("books")
             .document(bookId!!)

@@ -11,6 +11,7 @@ import com.maddy.jetpackbookreader.model.Item
 import com.maddy.jetpackbookreader.model.ReadingBook
 import com.maddy.jetpackbookreader.repository.BookRepository
 import com.maddy.jetpackbookreader.repository.NewFireRepository
+import com.maddy.jetpackbookreader.utils.formatDate
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -101,7 +102,7 @@ class BookDetailsViewModel @Inject constructor(
         return ReadingBook(
             title = volumeInfo?.title.toString(),
             authors = volumeInfo?.authors.toString(),
-            notes = listOf("Book Saved on ${Timestamp.now().toDate()}"),
+            notes = listOf("Book Saved on ${formatDate(Timestamp.now())}"),
             photoUrl = volumeInfo?.imageLinks?.thumbnail.toString(),
             categories = volumeInfo?.categories.toString(),
             publishedDate = volumeInfo?.publishedDate.toString(),

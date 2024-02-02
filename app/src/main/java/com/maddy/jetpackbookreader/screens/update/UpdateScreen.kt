@@ -1,6 +1,5 @@
 package com.maddy.jetpackbookreader.screens.update
 
-import android.util.Log
 import android.widget.Toast
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
@@ -49,7 +48,6 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
 import coil.compose.rememberAsyncImagePainter
-import com.google.firebase.Timestamp
 import com.maddy.jetpackbookreader.R
 import com.maddy.jetpackbookreader.components.NoteRow
 import com.maddy.jetpackbookreader.components.RoundedButton
@@ -59,6 +57,7 @@ import com.maddy.jetpackbookreader.navigation.ReaderScreens
 import com.maddy.jetpackbookreader.screens.home.HomeViewModel
 import com.maddy.jetpackbookreader.screens.home.NewHomeViewModel
 import com.maddy.jetpackbookreader.ui.theme.JetpackBookReaderTheme
+import com.maddy.jetpackbookreader.utils.formatDate
 import com.maddy.jetpackbookreader.utils.getBook
 import com.maddy.jetpackbookreader.widgets.AverageRatingBar
 import com.maddy.jetpackbookreader.widgets.BookRatingBar
@@ -99,14 +98,14 @@ fun ShowBookUpdate(
     book: ReadingBook = getBook()
 ) {
     val yourRating = book.yourRating?.toDouble()?.toInt() ?: 0
+    val ratingState = remember { mutableIntStateOf(yourRating) }
     val noteState = rememberSaveable { mutableStateOf("") }
 
     // variables to check if we need to update
-    val updateRatingState = remember { mutableIntStateOf(yourRating) }
+    val updateRatingState = remember { mutableStateOf(false) }
     val updateStartReadingState = remember { mutableStateOf(false) }
     val updateFinishReadingState = remember { mutableStateOf(false) }
     val updateNoteState = remember { mutableStateOf(false) }
-
 
     Column(
         modifier = Modifier
@@ -119,25 +118,24 @@ fun ShowBookUpdate(
             navController,
             newHomeViewModel,
             book,
-            yourRating,
+            ratingState,
             updateRatingState,
             updateStartReadingState,
             updateFinishReadingState,
             noteState,
             updateNoteState,
         )
-        BookImageAndTitle(book) {
-            navController.navigate(ReaderScreens.BookDetailsScreen.name + "/${book.googleBookId}")
-        }
+        BookImageAndTitle(book) { navController.navigate(ReaderScreens.BookDetailsScreen.name + "/${book.googleBookId}") }
         BookRatingBar(text = "Your Rating", rating = yourRating) { newRating ->
-            updateRatingState.intValue = newRating
-            Log.d("TAG", "ShowSimpleForm: ${updateRatingState.intValue}")
+            if (newRating != ratingState.intValue){
+                ratingState.intValue = newRating
+                updateRatingState.value = true
+            }
         }
         StartReadingCard(updateStartReadingState, book)
         FinishReadingCard(updateFinishReadingState, book)
         EditNoteTextField { note ->
-            Log.d("UpdateScreen", "EditNotesTextField: $note ")
-            if (note.isNotEmpty()) {
+            if (note != null && note.length > 0) {
                 noteState.value = note
                 updateNoteState.value = true
             }
@@ -151,8 +149,8 @@ fun UpdateAndDeleteButton(
     navController: NavController,
     newHomeViewModel: NewHomeViewModel,
     book: ReadingBook,
-    yourRating: Int,
     ratingState: MutableState<Int>,
+    updateRatingState: MutableState<Boolean>,
     updateStartReadingState: MutableState<Boolean>,
     updateFinishReadingState: MutableState<Boolean>,
     noteState: MutableState<String>,
@@ -160,17 +158,11 @@ fun UpdateAndDeleteButton(
 ) {
     val context = LocalContext.current
 
-    val changedRating = yourRating != ratingState.value
-    val isStartedTimestamp =
-        if (updateStartReadingState.value) Timestamp.now() else book.startedReading
-    val isFinishedTimestamp = if(updateFinishReadingState.value) Timestamp.now() else book.finishedReading
-
-    val mutableNotes = book.notes?.toMutableList() ?: mutableListOf()
-    mutableNotes.add(0, noteState.value)
-
-    val newNotes: List<String>? = if (updateNoteState.value) mutableNotes  else listOf("")
     // if true - then will update the book with new changes
-    val bookUpdate = changedRating || updateStartReadingState.value || updateFinishReadingState.value || updateNoteState.value
+    val updateBook = updateRatingState.value
+            || updateStartReadingState.value
+            || updateFinishReadingState.value
+            || updateNoteState.value
 
     Row(
         modifier = Modifier
@@ -180,24 +172,28 @@ fun UpdateAndDeleteButton(
         verticalAlignment = Alignment.CenterVertically
     ) {
         RoundedButton(text = "Update") {
-            if (bookUpdate) {
-                newHomeViewModel.updateBook(
+            if (updateBook) {
+                newHomeViewModel.updateBookInDatabase(
+                    book,
                     book.id,
                     ratingState.value,
-                    isStartedTimestamp,
-                    isFinishedTimestamp,
-                    newNotes
+                    noteState.value,
+                    updateRatingState.value,
+                    updateStartReadingState.value,
+                    updateFinishReadingState.value,
+                    updateNoteState.value,
                 ) { updated ->
                     if (updated) {
-                        Toast.makeText(context, "Book Updated Successfully", Toast.LENGTH_SHORT)
+                        Toast
+                            .makeText(context, "Book Updated Successfully", Toast.LENGTH_SHORT)
                             .show()
                         navController.navigate(ReaderScreens.HomeScreen.name) {
-                            popUpTo(navController.graph.id) {
-                                inclusive = true
-                            }
+                            popUpTo(navController.graph.id) { inclusive = true }
                         }
                     } else {
-                        Toast.makeText(context, "Book Update Failed", Toast.LENGTH_SHORT).show()
+                        Toast
+                            .makeText(context, "Book Update Failed", Toast.LENGTH_SHORT)
+                            .show()
                     }
                 }
             }
@@ -292,7 +288,6 @@ fun StartReadingCard(updateStartReadingState: MutableState<Boolean>, book: Readi
                 onClick = {
                     startReadingEnabled.value = !startReadingEnabled.value
                     updateStartReadingState.value = true
-
                 },
                 enabled = startReadingEnabled.value
             ) {
@@ -317,7 +312,7 @@ fun StartReadingCard(updateStartReadingState: MutableState<Boolean>, book: Readi
                     color = MaterialTheme.colorScheme.secondaryContainer,
                 ) {
                     Text(
-                        text = "${book.startedReading?.toDate() ?: "start date"}",
+                        text = "${formatDate(book.startedReading) ?: "start date"}",
                         style = MaterialTheme.typography.labelSmall,
                         color = MaterialTheme.colorScheme.tertiary,
                         modifier = Modifier.padding(horizontal = 12.dp, vertical = 4.dp)
@@ -379,7 +374,7 @@ fun FinishReadingCard(updateFinishReadingState: MutableState<Boolean>, book: Rea
                     color = MaterialTheme.colorScheme.secondaryContainer,
                 ) {
                     Text(
-                        text = "${book.finishedReading?.toDate() ?: "finish date"}",
+                        text = "${formatDate(book.finishedReading) ?: "finish date"}",
                         style = MaterialTheme.typography.labelSmall,
                         color = MaterialTheme.colorScheme.tertiary,
                         modifier = Modifier.padding(horizontal = 12.dp, vertical = 4.dp)
