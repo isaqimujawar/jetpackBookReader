@@ -28,6 +28,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
@@ -49,6 +50,7 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
 import coil.compose.rememberAsyncImagePainter
+import com.google.firebase.Timestamp
 import com.maddy.jetpackbookreader.R
 import com.maddy.jetpackbookreader.components.NoteRow
 import com.maddy.jetpackbookreader.components.RoundedButton
@@ -86,7 +88,7 @@ fun UpdateScreen(
                 .fillMaxSize()
         ) {
             if (book.title.isNullOrEmpty()) ShowProgressIndicator()
-            else ShowBookUpdate(navController, newHomeViewModel, book,)
+            else ShowBookUpdate(navController, newHomeViewModel, book)
         }
     }
 }
@@ -100,7 +102,9 @@ fun ShowBookUpdate(
     val yourRating = book.yourRating?.toDouble()?.toInt() ?: 0
 
     // variables to check if we need to update
-    val ratingState = remember { mutableStateOf(yourRating) }
+    val updateRatingState = remember { mutableIntStateOf(yourRating) }
+    val updateStartReadingState = remember { mutableStateOf(false) }
+
 
     Column(
         modifier = Modifier
@@ -109,15 +113,15 @@ fun ShowBookUpdate(
         verticalArrangement = Arrangement.Top,
         horizontalAlignment = Alignment.Start
     ) {
-        UpdateAndDeleteButton(navController, newHomeViewModel, book, yourRating, ratingState)
+        UpdateAndDeleteButton(navController, newHomeViewModel, book, yourRating, updateRatingState, updateStartReadingState)
         BookImageAndTitle(book) {
             navController.navigate(ReaderScreens.BookDetailsScreen.name + "/${book.googleBookId}")
         }
         BookRatingBar(text = "Your Rating", rating = yourRating) { newRating ->
-            ratingState.value = newRating
-            Log.d("TAG", "ShowSimpleForm: ${ratingState.value}")
+            updateRatingState.value = newRating
+            Log.d("TAG", "ShowSimpleForm: ${updateRatingState.value}")
         }
-        StartReadingCard()
+        StartReadingCard(updateStartReadingState, book)
         FinishReadingCard()
         EditNoteTextField { note ->
             Log.d("UpdateScreen", "EditNotesTextField: $note ")
@@ -128,13 +132,21 @@ fun ShowBookUpdate(
 }
 
 @Composable
-fun UpdateAndDeleteButton(navController: NavController, newHomeViewModel: NewHomeViewModel, book: ReadingBook, yourRating: Int, ratingState: MutableState<Int>) {
+fun UpdateAndDeleteButton(
+    navController: NavController,
+    newHomeViewModel: NewHomeViewModel,
+    book: ReadingBook,
+    yourRating: Int,
+    ratingState: MutableState<Int>,
+    updateStartReadingState: MutableState<Boolean>
+) {
     val context = LocalContext.current
 
     val changedRating = yourRating != ratingState.value
+    val isStartedTimestamp = if (updateStartReadingState.value) Timestamp.now() else book.startedReading
 
     // if true - then will update the book with new changes
-    val bookUpdate = changedRating
+    val bookUpdate = changedRating || updateStartReadingState.value
 
     Row(
         modifier = Modifier
@@ -145,7 +157,7 @@ fun UpdateAndDeleteButton(navController: NavController, newHomeViewModel: NewHom
     ) {
         RoundedButton(text = "Update") {
             if (bookUpdate) {
-                newHomeViewModel.updateBook(book.id, ratingState.value) { updated ->
+                newHomeViewModel.updateBook(book.id, ratingState.value, isStartedTimestamp) { updated ->
                     if (updated) {
                         Toast.makeText(context, "Book Updated Succefully", Toast.LENGTH_SHORT).show()
                         navController.navigate(ReaderScreens.HomeScreen.name) {
@@ -224,10 +236,9 @@ private fun BookImageAndTitle(book: ReadingBook, onClick: () -> Unit = {}) {
 }
 
 @Composable
-fun StartReadingCard() {
-    var startReadingState by rememberSaveable { mutableStateOf("Start Reading") }
-    var startReadingEnabled by rememberSaveable { mutableStateOf(true) }
-
+fun StartReadingCard(updateStartReadingState: MutableState<Boolean>, book: ReadingBook) {
+    var startReadingEnabled = if(book.startedReading != null ) remember { mutableStateOf(false) }
+    else remember { mutableStateOf(true) }
     Surface(
         modifier = Modifier
             .padding(horizontal = 8.dp, vertical = 16.dp)
@@ -247,13 +258,14 @@ fun StartReadingCard() {
         ) {
             Button(
                 onClick = {
-                    startReadingState = "Start Reading"
-                    startReadingEnabled = !startReadingEnabled
+                    startReadingEnabled.value = !startReadingEnabled.value
+                    updateStartReadingState.value = true
+
                 },
-                enabled = startReadingEnabled
+                enabled = startReadingEnabled.value
             ) {
                 Text(
-                    text = startReadingState,
+                    text = "Start Reading",
                     style = MaterialTheme.typography.titleMedium,
                     color = MaterialTheme.colorScheme.onPrimary,
                     fontWeight = FontWeight.Bold,
@@ -273,7 +285,7 @@ fun StartReadingCard() {
                     color = MaterialTheme.colorScheme.secondaryContainer,
                 ) {
                     Text(
-                        text = "start date",
+                        text = "${book.startedReading?.toDate() ?: "start date"}",
                         style = MaterialTheme.typography.labelSmall,
                         color = MaterialTheme.colorScheme.tertiary,
                         modifier = Modifier.padding(horizontal = 12.dp, vertical = 4.dp)
@@ -378,8 +390,17 @@ fun EditNoteTextField(onNoteEdit: (String) -> Unit) {
 
 @Composable
 fun NoteList(notes: List<String>) {
-    for (i in 1..10) {
-        NoteRow()
+    /*
+    // We cannot add a LazyColumn in a Vertically Scrollable Column
+    // it leads to infinity maximum height issue
+    LazyColumn {
+        items(items = notes) { note ->
+            NoteRow(note = note)
+        }
+    }*/
+
+    for(element in notes) {
+        NoteRow(note = element)
     }
 }
 
@@ -389,6 +410,6 @@ fun NoteList(notes: List<String>) {
 fun UpdateScreenPreview() {
 // You can use some sample data to preview your composable without the need to construct the ViewModel
     JetpackBookReaderTheme {
-        StartReadingCard()
+        // StartReadingCard()
     }
 }

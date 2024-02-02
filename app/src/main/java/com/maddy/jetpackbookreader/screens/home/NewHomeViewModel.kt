@@ -2,6 +2,7 @@ package com.maddy.jetpackbookreader.screens.home
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.google.firebase.Timestamp
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
 import com.maddy.jetpackbookreader.model.ReadingBook
@@ -58,8 +59,16 @@ class NewHomeViewModel @Inject constructor(private val repository: NewFireReposi
             ReadingBook()
     }
 
-    fun updateBook(bookId: String?, newRating: Int, onUpdateComplete: (Boolean) -> Unit) {
-        val bookToUpdate = hashMapOf("your_rating" to newRating.toString()).toMap()
+    fun updateBook(
+        bookId: String?,
+        newRating: Int,
+        isStartedTimestamp: Timestamp?,
+        onUpdateComplete: (Boolean) -> Unit
+    ) {
+        val bookToUpdate = hashMapOf(
+            "your_rating" to newRating.toString(),
+            "started_reading_at" to isStartedTimestamp
+        ).toMap()
 
         FirebaseFirestore.getInstance()
             .collection("books")
