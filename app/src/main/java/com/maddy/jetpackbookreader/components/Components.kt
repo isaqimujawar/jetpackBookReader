@@ -73,8 +73,8 @@ fun ShowProgressIndicator() {
 
 @Composable
 fun NoteRow(
-    note: String = "dummy note 1",
     modifier: Modifier = Modifier,
+    note: String = "dummy note 1",
     onNoteClicked: (String) -> Unit = {},
 ) {
     Surface(

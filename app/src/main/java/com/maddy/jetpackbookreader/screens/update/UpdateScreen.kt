@@ -34,7 +34,6 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
-import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.platform.LocalContext
@@ -100,11 +99,13 @@ fun ShowBookUpdate(
     book: ReadingBook = getBook()
 ) {
     val yourRating = book.yourRating?.toDouble()?.toInt() ?: 0
+    val noteState = rememberSaveable { mutableStateOf("") }
 
     // variables to check if we need to update
     val updateRatingState = remember { mutableIntStateOf(yourRating) }
     val updateStartReadingState = remember { mutableStateOf(false) }
     val updateFinishReadingState = remember { mutableStateOf(false) }
+    val updateNoteState = remember { mutableStateOf(false) }
 
 
     Column(
@@ -121,22 +122,27 @@ fun ShowBookUpdate(
             yourRating,
             updateRatingState,
             updateStartReadingState,
-            updateFinishReadingState
+            updateFinishReadingState,
+            noteState,
+            updateNoteState,
         )
         BookImageAndTitle(book) {
             navController.navigate(ReaderScreens.BookDetailsScreen.name + "/${book.googleBookId}")
         }
         BookRatingBar(text = "Your Rating", rating = yourRating) { newRating ->
-            updateRatingState.value = newRating
-            Log.d("TAG", "ShowSimpleForm: ${updateRatingState.value}")
+            updateRatingState.intValue = newRating
+            Log.d("TAG", "ShowSimpleForm: ${updateRatingState.intValue}")
         }
         StartReadingCard(updateStartReadingState, book)
         FinishReadingCard(updateFinishReadingState, book)
         EditNoteTextField { note ->
             Log.d("UpdateScreen", "EditNotesTextField: $note ")
-            // TODO("Save the note to the given book")
+            if (note.isNotEmpty()) {
+                noteState.value = note
+                updateNoteState.value = true
+            }
         }
-        NoteList(notes = book.notes ?: listOf("dummy note 1", "dummy note 2", "dummy note 3"))
+        NoteList(notes = book.notes ?: listOf("notes not added"))
     }
 }
 
@@ -148,7 +154,9 @@ fun UpdateAndDeleteButton(
     yourRating: Int,
     ratingState: MutableState<Int>,
     updateStartReadingState: MutableState<Boolean>,
-    updateFinishReadingState: MutableState<Boolean>
+    updateFinishReadingState: MutableState<Boolean>,
+    noteState: MutableState<String>,
+    updateNoteState: MutableState<Boolean>
 ) {
     val context = LocalContext.current
 
@@ -157,8 +165,12 @@ fun UpdateAndDeleteButton(
         if (updateStartReadingState.value) Timestamp.now() else book.startedReading
     val isFinishedTimestamp = if(updateFinishReadingState.value) Timestamp.now() else book.finishedReading
 
+    val mutableNotes = book.notes?.toMutableList() ?: mutableListOf()
+    mutableNotes.add(0, noteState.value)
+
+    val newNotes: List<String>? = if (updateNoteState.value) mutableNotes  else listOf("")
     // if true - then will update the book with new changes
-    val bookUpdate = changedRating || updateStartReadingState.value || updateFinishReadingState.value
+    val bookUpdate = changedRating || updateStartReadingState.value || updateFinishReadingState.value || updateNoteState.value
 
     Row(
         modifier = Modifier
@@ -173,10 +185,11 @@ fun UpdateAndDeleteButton(
                     book.id,
                     ratingState.value,
                     isStartedTimestamp,
-                    isFinishedTimestamp
+                    isFinishedTimestamp,
+                    newNotes
                 ) { updated ->
                     if (updated) {
-                        Toast.makeText(context, "Book Updated Succefully", Toast.LENGTH_SHORT)
+                        Toast.makeText(context, "Book Updated Successfully", Toast.LENGTH_SHORT)
                             .show()
                         navController.navigate(ReaderScreens.HomeScreen.name) {
                             popUpTo(navController.graph.id) {
@@ -255,7 +268,7 @@ private fun BookImageAndTitle(book: ReadingBook, onClick: () -> Unit = {}) {
 
 @Composable
 fun StartReadingCard(updateStartReadingState: MutableState<Boolean>, book: ReadingBook) {
-    var startReadingEnabled = if (book.startedReading != null) remember { mutableStateOf(false) }
+    val startReadingEnabled = if (book.startedReading != null) remember { mutableStateOf(false) }
     else remember { mutableStateOf(true) }
 
     Surface(
@@ -317,7 +330,7 @@ fun StartReadingCard(updateStartReadingState: MutableState<Boolean>, book: Readi
 
 @Composable
 fun FinishReadingCard(updateFinishReadingState: MutableState<Boolean>, book: ReadingBook) {
-    var finishReadingEnabled = if (book.finishedReading != null) remember { mutableStateOf(false) }
+    val finishReadingEnabled = if (book.finishedReading != null) remember { mutableStateOf(false) }
     else remember { mutableStateOf(true) }
 
     Surface(
@@ -377,7 +390,6 @@ fun FinishReadingCard(updateFinishReadingState: MutableState<Boolean>, book: Rea
     }
 }
 
-@OptIn(ExperimentalComposeUiApi::class)
 @Composable
 fun EditNoteTextField(onNoteEdit: (String) -> Unit) {
     var noteState by rememberSaveable { mutableStateOf("") }
@@ -393,7 +405,7 @@ fun EditNoteTextField(onNoteEdit: (String) -> Unit) {
         //.verticalScroll(rememberScrollState()),
         enabled = true,
         label = { Text(text = stringResource(R.string.enter_your_thoughts)) },
-        placeholder = { Text(text = stringResource(R.string.your_notes)) },
+        placeholder = { Text(text = stringResource(R.string.add_note)) },
         keyboardOptions = KeyboardOptions(
             keyboardType = KeyboardType.Text,
             imeAction = ImeAction.Done
