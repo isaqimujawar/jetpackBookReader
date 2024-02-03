@@ -26,8 +26,8 @@ import androidx.compose.material.icons.rounded.FavoriteBorder
 import androidx.compose.material.icons.rounded.Star
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
-import androidx.compose.material3.Divider
 import androidx.compose.material3.FloatingActionButton
+import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
@@ -44,11 +44,13 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavController
 import coil.compose.rememberAsyncImagePainter
 import com.maddy.jetpackbookreader.R
 import com.maddy.jetpackbookreader.components.RoundedButton
 import com.maddy.jetpackbookreader.components.ShowProgressIndicator
+import com.maddy.jetpackbookreader.components.ShowText
 import com.maddy.jetpackbookreader.components.TitleText
 import com.maddy.jetpackbookreader.model.ReadingBook
 import com.maddy.jetpackbookreader.navigation.ReaderScreens
@@ -117,9 +119,29 @@ fun HomeContent(
 ) {
     val displayName = viewModel.getUserDisplayName()
     val listOfBooks: List<ReadingBook> = viewModel.getReadingBookList()
+    val loading = viewModel.loadingStateFlow.collectAsStateWithLifecycle()
 
-    if (listOfBooks.isEmpty()) ShowProgressIndicator()
-    else ShowHomeScreen(modifier, displayName, navController, listOfBooks)
+    // if (listOfBooks.isEmpty()) ShowProgressIndicator()
+    if (loading.value) {
+        ShowProgressIndicator()
+    } else {
+        if (listOfBooks.isNullOrEmpty()) NoBookFoundText(navController)
+        else ShowHomeScreen(modifier, displayName, navController, listOfBooks)
+    }
+}
+
+@Composable
+private fun NoBookFoundText(navController: NavController) {
+    Column(
+        modifier = Modifier
+            .padding(8.dp)
+            .fillMaxSize()
+    ) {
+        TitleSection(displayName = "username") {
+            navController.navigate(route = ReaderScreens.ReaderStatsScreen.name)
+        }
+        ShowText(text = "No Books found. Add a Book")
+    }
 }
 
 @Composable
@@ -140,23 +162,23 @@ private fun ShowHomeScreen(
         }
         ReadingBookList(navController, listOfBooks)
         Spacer(modifier = Modifier.height(12.dp))
-        TitleText("Reading List")
-        ReadingBookList(navController, listOfBooks)
+        TitleText("Added List")
+        AddedBookList(navController, listOfBooks)
     }
 }
 
 @Composable
 private fun TitleSection(
-    modifier: Modifier,
-    displayName: String,
-    onProfileClicked: () -> Unit
+    modifier: Modifier = Modifier,
+    displayName: String = "Title",
+    onProfileClicked: () -> Unit = {}
 ) {
     Row(
         modifier = modifier.fillMaxWidth(),
         horizontalArrangement = Arrangement.SpaceBetween,
         verticalAlignment = Alignment.CenterVertically
     ) {
-        TitleText("My Reading Activity")
+        TitleText("My Reading Now")
         Column(
             modifier = Modifier.clickable { onProfileClicked() },
             horizontalAlignment = Alignment.CenterHorizontally
@@ -169,19 +191,19 @@ private fun TitleSection(
             )
             Text(
                 text = displayName,
-                modifier = Modifier.width(60.dp),
+                modifier = Modifier.width(65.dp),
                 style = MaterialTheme.typography.labelMedium,
                 color = MaterialTheme.colorScheme.primary,
                 maxLines = 1,
-                overflow = TextOverflow.Clip
+                overflow = TextOverflow.Ellipsis
             )
-            Divider(modifier = Modifier.width(60.dp))
+            HorizontalDivider(modifier = Modifier.width(60.dp))
         }
     }
 }
 
 @Composable
-fun BookCard(book: ReadingBook, onClick: (String?) -> Unit = {}) {
+fun BookCard(book: ReadingBook, buttonText: String, onClick: (String?) -> Unit = {}) {
     Card(
         modifier = Modifier
             .padding(12.dp)
@@ -199,7 +221,7 @@ fun BookCard(book: ReadingBook, onClick: (String?) -> Unit = {}) {
                 horizontalArrangement = Arrangement.End,
                 verticalAlignment = Alignment.CenterVertically
             ) {
-                RoundedButton("Reading")
+                RoundedButton(buttonText)
             }
         }
     }
@@ -288,17 +310,48 @@ private fun BookTitleAndAuthor(title: String?, author: String?) {
 
 @Composable
 fun ReadingBookList(navController: NavController, listOfBooks: List<ReadingBook>) {
-    LazyRow {
-        items(items = listOfBooks) {
-            BookCard(book = it) { bookId ->
-                navController.navigate(ReaderScreens.UpdateScreen.name + "/$bookId")
+    val readingBooks = listOfBooks.filter { book ->
+        book.startedReading != null && book.finishedReading == null
+    }
+
+    if (readingBooks.isNullOrEmpty()) {
+        ShowText(text = "Start Reading a Book")
+    } else {
+
+        LazyRow {
+            items(items = readingBooks) {
+                BookCard(book = it, buttonText = "Reading") { bookId ->
+                    navController.navigate(ReaderScreens.UpdateScreen.name + "/$bookId")
+                }
             }
         }
     }
 }
 
+@Composable
+fun AddedBookList(navController: NavController, listOfBooks: List<ReadingBook>) {
+    val addedBooks = listOfBooks.filter { book ->
+        book.startedReading == null && book.finishedReading == null
+    }
+
+    if (addedBooks.isNullOrEmpty()) {
+        ShowText(text = "Add a Book")
+    } else {
+        LazyRow {
+            items(items = addedBooks) {
+                BookCard(book = it, buttonText = "Added") { bookId ->
+                    navController.navigate(ReaderScreens.UpdateScreen.name + "/$bookId")
+                }
+            }
+        }
+    }
+
+}
+
+
+
 @Preview(showSystemUi = true)
 @Composable
 fun BookCardPreview() {
-    JetpackBookReaderTheme { BookCard(getBook()) }
+    JetpackBookReaderTheme { BookCard(getBook(), "Added") }
 }
