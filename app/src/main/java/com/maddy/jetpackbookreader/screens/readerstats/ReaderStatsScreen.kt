@@ -17,6 +17,7 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.rounded.KeyboardArrowDown
 import androidx.compose.material.icons.rounded.KeyboardArrowUp
+import androidx.compose.material.icons.rounded.ThumbUp
 import androidx.compose.material.icons.sharp.Person
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
@@ -30,6 +31,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.stringResource
@@ -46,6 +48,7 @@ import com.maddy.jetpackbookreader.components.ShowProgressIndicator
 import com.maddy.jetpackbookreader.model.ReadingBook
 import com.maddy.jetpackbookreader.navigation.ReaderScreens
 import com.maddy.jetpackbookreader.screens.home.NewHomeViewModel
+import com.maddy.jetpackbookreader.utils.formatDate
 import com.maddy.jetpackbookreader.widgets.ReaderTopAppBar
 
 @Composable
@@ -96,7 +99,7 @@ fun YourStats(
             .verticalScroll(rememberScrollState()),
         verticalArrangement = Arrangement.Top,
 
-    ) {
+        ) {
         ReadingCard("You have finished", viewModel.getFinishBookList(listOfBooks), navController)
         ReadingCard("Your are reading", viewModel.getReadingNowBookList(listOfBooks), navController)
         ReadingCard("You have added", viewModel.getAddedBookList(listOfBooks), navController)
@@ -126,14 +129,14 @@ fun ReadingCard(cardTitle: String, listOfBooks: List<ReadingBook>, navController
             ) {
                 Text(text = "$cardTitle: ${listOfBooks.size} books")
                 Icon(
-                    imageVector = if (showList.value) Icons.Rounded.KeyboardArrowUp else  Icons.Rounded.KeyboardArrowDown,
+                    imageVector = if (showList.value) Icons.Rounded.KeyboardArrowUp else Icons.Rounded.KeyboardArrowDown,
                     contentDescription = stringResource(R.string.toggle_icon)
                 )
             }
             if (showList.value) {
                 listOfBooks.forEach {
-                    BookStatsCard(book = it) {
-                        navController.navigate(ReaderScreens.UpdateScreen.name + "/$it")
+                    BookStatsCard(book = it) {book ->
+                        navController.navigate(ReaderScreens.UpdateScreen.name + "/$book")
                     }
                 }
             }
@@ -206,18 +209,18 @@ fun BookStatsCard(book: ReadingBook, onClick: (String) -> Unit = {}) {
             Column(
                 modifier = Modifier
                     .padding(horizontal = 4.dp)
-                    .fillMaxWidth(),
+                    .fillMaxWidth(0.8f),
                 verticalArrangement = Arrangement.Center,
                 horizontalAlignment = Alignment.Start
             ) {
                 Text(
-                    text = "${book?.title}",
+                    text = book.title.toString(),
                     style = MaterialTheme.typography.labelLarge,
                     color = MaterialTheme.colorScheme.onSurfaceVariant,
                     fontWeight = FontWeight.SemiBold
                 )
                 Text(
-                    text = "Authors: ${book?.authors}",
+                    text = "Authors: ${book.authors.toString()}",
                     style = MaterialTheme.typography.labelMedium,
                     color = MaterialTheme.colorScheme.onSurfaceVariant,
                     fontStyle = FontStyle.Italic,
@@ -225,7 +228,7 @@ fun BookStatsCard(book: ReadingBook, onClick: (String) -> Unit = {}) {
                     overflow = TextOverflow.Ellipsis
                 )
                 Text(
-                    text = "Date: ${book?.publishedDate}, Rating: ${book?.averageRating ?: "N/A"}",
+                    text = "Started: ${formatDate(book.startedReading) ?: "Not Yet"}",
                     style = MaterialTheme.typography.labelMedium,
                     color = MaterialTheme.colorScheme.onSurfaceVariant,
                     fontStyle = FontStyle.Italic,
@@ -233,13 +236,26 @@ fun BookStatsCard(book: ReadingBook, onClick: (String) -> Unit = {}) {
                     overflow = TextOverflow.Ellipsis
                 )
                 Text(
-                    text = "Category: ${book?.categories}",
+                    text = "Finished: ${formatDate(book.finishedReading) ?: "Not Yet"}",
                     style = MaterialTheme.typography.labelMedium,
                     color = MaterialTheme.colorScheme.onSurfaceVariant,
                     fontStyle = FontStyle.Italic,
                     maxLines = 1,
                     overflow = TextOverflow.Ellipsis
                 )
+            }
+            if (book.yourRating?.toDouble()?.toInt()!! >= 4) {
+                Column(
+                    modifier = Modifier.padding(4.dp),
+                    verticalArrangement = Arrangement.Top,
+                    horizontalAlignment = Alignment.Start
+                ) {
+                    Icon(
+                        imageVector = Icons.Rounded.ThumbUp,
+                        contentDescription = stringResource(R.string.thumbup_icon),
+                        tint = Color.Green.copy(alpha = 0.5f)
+                    )
+                }
             }
         }
     }

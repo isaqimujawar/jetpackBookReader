@@ -22,7 +22,6 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.AccountCircle
 import androidx.compose.material.icons.filled.Add
-import androidx.compose.material.icons.rounded.FavoriteBorder
 import androidx.compose.material.icons.rounded.Star
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
@@ -49,6 +48,7 @@ import androidx.navigation.NavController
 import coil.compose.rememberAsyncImagePainter
 import com.maddy.jetpackbookreader.R
 import com.maddy.jetpackbookreader.components.RoundedButton
+import com.maddy.jetpackbookreader.components.ShowFavoriteIcon
 import com.maddy.jetpackbookreader.components.ShowProgressIndicator
 import com.maddy.jetpackbookreader.components.ShowText
 import com.maddy.jetpackbookreader.components.TitleText
@@ -215,7 +215,7 @@ fun BookCard(book: ReadingBook, buttonText: String, onClick: (String?) -> Unit =
         elevation = CardDefaults.cardElevation(6.dp),
     ) {
         Column {
-            BookImageAndRating(imageUrl = book.photoUrl, rating = book.averageRating ?: "N/A")
+            BookImageAndRating(imageUrl = book.photoUrl, rating = book.yourRating ?: "N/A")
             BookTitleAndAuthor(book.title, book.authors)
             Row(
                 modifier = Modifier.fillMaxWidth(),
@@ -258,11 +258,7 @@ fun BookRating(rating: String) {
         verticalArrangement = Arrangement.Center,
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
-        Icon(
-            imageVector = Icons.Rounded.FavoriteBorder,
-            contentDescription = stringResource(R.string.favorite_icon),
-            modifier = Modifier.padding(top = 2.dp)
-        )
+        ShowFavoriteIcon(rating = rating.toDouble().toInt())
         Spacer(modifier = Modifier.height(16.dp))
         Surface(
             shape = RoundedCornerShape(56.dp),
@@ -279,7 +275,7 @@ fun BookRating(rating: String) {
                     tint = Color(0xFFFFD700)
                 )
                 Text(
-                    text = rating, style = MaterialTheme.typography.headlineSmall
+                    text = "${rating}.0", style = MaterialTheme.typography.headlineSmall
                 )
             }
         }
