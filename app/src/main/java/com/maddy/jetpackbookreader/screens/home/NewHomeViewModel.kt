@@ -24,6 +24,8 @@ class NewHomeViewModel @Inject constructor(private val repository: NewFireReposi
 
     val bookListStateFlow: StateFlow<List<ReadingBook>> = repository.bookListStateFlow
     val errorStateFlow: StateFlow<String?> = repository.errorStateFlow
+    val loadingStateFlow: StateFlow<Boolean> = repository.loadingStateFlow
+
     private val currentUser = FirebaseAuth.getInstance().currentUser
 
     init {
@@ -44,13 +46,14 @@ class NewHomeViewModel @Inject constructor(private val repository: NewFireReposi
         FirebaseAuth.getInstance().signOut()
     }
 
-    fun getReadingBookList(): List<ReadingBook> =
-        if (!bookListStateFlow.value.isNullOrEmpty()) {
+    fun getReadingBookList(): List<ReadingBook> {
+        return if (!bookListStateFlow.value.isNullOrEmpty()) {
             bookListStateFlow.value!!.toList().filter { readingBook ->
                 // here the predicate is that the books should belong to the currentUser.uid
                 readingBook.userId == currentUser?.uid
             }
         } else emptyList<ReadingBook>()
+    }
 
     fun getBookById(bookId: String): ReadingBook {
         return if (errorStateFlow.value == null)
