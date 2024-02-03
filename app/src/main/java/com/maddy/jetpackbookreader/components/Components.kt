@@ -69,7 +69,7 @@ fun ShowProgressIndicator() {
         horizontalAlignment = Alignment.Start
     ) {
         LinearProgressIndicator()
-        Text(text = "Loading book...")
+        Text(text = "Loading books...")
     }
 }
 
