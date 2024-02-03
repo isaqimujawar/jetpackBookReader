@@ -36,15 +36,16 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavController
 import coil.compose.rememberAsyncImagePainter
 import com.maddy.jetpackbookreader.R
+import com.maddy.jetpackbookreader.components.ShowProgressIndicator
 import com.maddy.jetpackbookreader.model.ReadingBook
+import com.maddy.jetpackbookreader.navigation.ReaderScreens
 import com.maddy.jetpackbookreader.screens.home.NewHomeViewModel
-import com.maddy.jetpackbookreader.utils.getBook
 import com.maddy.jetpackbookreader.widgets.ReaderTopAppBar
 
 @Composable
@@ -52,6 +53,9 @@ fun ReaderStatsScreen(
     navController: NavController,
     viewModel: NewHomeViewModel = hiltViewModel()
 ) {
+    val listOfBooks: List<ReadingBook> = viewModel.getReadingBookList()
+    val loading = viewModel.loadingStateFlow.collectAsStateWithLifecycle()
+
     Scaffold(
         topBar = {
             ReaderTopAppBar(title = "Book Stats") {
@@ -62,7 +66,18 @@ fun ReaderStatsScreen(
         Surface(modifier = Modifier.padding(it)) {
             Column {
                 ShowUsername(viewModel.getUserDisplayName().uppercase())
-                YourStats(navController, viewModel)
+                Text(
+                    text = "Your Stats",
+                    modifier = Modifier.padding(8.dp),
+                    style = MaterialTheme.typography.headlineSmall,
+                    color = MaterialTheme.colorScheme.primary,
+                )
+                if (loading.value) {
+                    ShowProgressIndicator()
+                } else {
+                    YourStats(navController, viewModel, listOfBooks)
+                }
+
             }
         }
 
@@ -70,14 +85,11 @@ fun ReaderStatsScreen(
 }
 
 @Composable
-fun YourStats(navController: NavController, viewModel: NewHomeViewModel) {
-
-    Text(
-        text = "Your Stats",
-        modifier = Modifier.padding(8.dp),
-        style = MaterialTheme.typography.headlineSmall,
-        color = MaterialTheme.colorScheme.primary,
-    )
+fun YourStats(
+    navController: NavController,
+    viewModel: NewHomeViewModel,
+    listOfBooks: List<ReadingBook>
+) {
     Column(
         modifier = Modifier
             .fillMaxWidth()
@@ -85,15 +97,14 @@ fun YourStats(navController: NavController, viewModel: NewHomeViewModel) {
         verticalArrangement = Arrangement.Top,
 
     ) {
-        ReadingCard()
-        ReadingCard()
-        ReadingCard()
+        ReadingCard("You have finished", viewModel.getFinishBookList(listOfBooks), navController)
+        ReadingCard("Your are reading", viewModel.getReadingNowBookList(listOfBooks), navController)
+        ReadingCard("You have added", viewModel.getAddedBookList(listOfBooks), navController)
     }
 }
 
-@Preview(showSystemUi = true)
 @Composable
-fun ReadingCard(listOfBooks: List<ReadingBook> = listOf(getBook(), getBook(), getBook())) {
+fun ReadingCard(cardTitle: String, listOfBooks: List<ReadingBook>, navController: NavController) {
     val showList = rememberSaveable { mutableStateOf(false) }
 
     Card(
@@ -113,7 +124,7 @@ fun ReadingCard(listOfBooks: List<ReadingBook> = listOf(getBook(), getBook(), ge
                     .fillMaxWidth(),
                 horizontalArrangement = Arrangement.SpaceBetween
             ) {
-                Text(text = "You are reading: ${listOfBooks.size} books")
+                Text(text = "$cardTitle: ${listOfBooks.size} books")
                 Icon(
                     imageVector = if (showList.value) Icons.Rounded.KeyboardArrowUp else  Icons.Rounded.KeyboardArrowDown,
                     contentDescription = stringResource(R.string.toggle_icon)
@@ -121,7 +132,9 @@ fun ReadingCard(listOfBooks: List<ReadingBook> = listOf(getBook(), getBook(), ge
             }
             if (showList.value) {
                 listOfBooks.forEach {
-                    BookStatsCard(book = it)
+                    BookStatsCard(book = it) {
+                        navController.navigate(ReaderScreens.UpdateScreen.name + "/$it")
+                    }
                 }
             }
         }
