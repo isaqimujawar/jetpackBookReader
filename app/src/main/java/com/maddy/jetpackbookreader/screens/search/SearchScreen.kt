@@ -25,7 +25,6 @@ import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
-import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
@@ -50,6 +49,7 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
 import coil.compose.rememberAsyncImagePainter
 import com.maddy.jetpackbookreader.R
+import com.maddy.jetpackbookreader.components.ShowProgressIndicator
 import com.maddy.jetpackbookreader.model.Item
 import com.maddy.jetpackbookreader.navigation.ReaderScreens
 import com.maddy.jetpackbookreader.widgets.ReaderTopAppBar
@@ -58,7 +58,7 @@ import com.maddy.jetpackbookreader.widgets.ReaderTopAppBar
 @Composable
 fun SearchScreen(navController: NavController, viewModel: SearchViewModel = hiltViewModel()) {
     val keyboardController = LocalSoftwareKeyboardController.current
-    val searchQueryState = rememberSaveable { mutableStateOf("bodybuilding") }
+    val searchQueryState = rememberSaveable { mutableStateOf("Habits") }
 
     Scaffold(
         topBar = {
@@ -106,7 +106,7 @@ fun SearchScreen(navController: NavController, viewModel: SearchViewModel = hilt
                     }
                 )
                 Spacer(Modifier.height(12.dp))
-                if (viewModel.isLoading) LinearProgressIndicator()
+                if (viewModel.isLoading) ShowProgressIndicator()
 
                 // BookList(viewModel.list)
                 BookList(viewModel.bookList) { bookId ->
@@ -153,11 +153,11 @@ fun NewBookCard(book: Item, onClick: (String) -> Unit = {}) {
         ) {
             Image(
                 painter = rememberAsyncImagePainter(model = imageUrl),
+                contentDescription = stringResource(R.string.book_image),
                 modifier = Modifier
                     .padding(end = 4.dp)
                     .width(80.dp)
                     .fillMaxHeight(),
-                contentDescription = stringResource(R.string.book_image),
                 contentScale = ContentScale.Crop
             )
             Column(
@@ -182,7 +182,7 @@ fun NewBookCard(book: Item, onClick: (String) -> Unit = {}) {
                     overflow = TextOverflow.Ellipsis
                 )
                 Text(
-                    text = "Date: ${book.volumeInfo?.publishedDate}",
+                    text = "Date: ${book.volumeInfo?.publishedDate}, Rating: ${book.volumeInfo?.averageRating ?: "N/A"}",
                     style = MaterialTheme.typography.labelMedium,
                     color = MaterialTheme.colorScheme.onSurfaceVariant,
                     fontStyle = FontStyle.Italic,

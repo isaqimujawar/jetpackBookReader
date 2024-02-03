@@ -11,7 +11,7 @@ data class ReadingBook(
 
     var authors: String? = null,
 
-    var notes: String? = null,
+    var notes: List<String>? = null,
 
     @get:PropertyName("book_photo_url")
     @set:PropertyName("book_photo_url")
@@ -23,7 +23,13 @@ data class ReadingBook(
     @set:PropertyName("published_date")
     var publishedDate: String? = null,
 
-    var rating: String? = null,
+    @get:PropertyName("your_rating")
+    @set:PropertyName("your_rating")
+    var yourRating: String? = null,
+
+    @get:PropertyName("average_rating")
+    @set:PropertyName("average_rating")
+    var averageRating: String? = null,
 
     var description: String? = null,
 

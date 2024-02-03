@@ -36,8 +36,8 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
@@ -45,8 +45,10 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
+import coil.compose.rememberAsyncImagePainter
 import com.maddy.jetpackbookreader.R
 import com.maddy.jetpackbookreader.components.RoundedButton
+import com.maddy.jetpackbookreader.components.ShowProgressIndicator
 import com.maddy.jetpackbookreader.components.TitleText
 import com.maddy.jetpackbookreader.model.ReadingBook
 import com.maddy.jetpackbookreader.navigation.ReaderScreens
@@ -56,13 +58,15 @@ import com.maddy.jetpackbookreader.widgets.HomeTopAppBar
 
 @Composable
 fun HomeScreen(
-    navController: NavController, viewModel: HomeViewModel = hiltViewModel()
+    navController: NavController,
+    viewModel: HomeViewModel = hiltViewModel(),
+    newHomeViewModel: NewHomeViewModel = hiltViewModel()
 ) {
-    val displayName = viewModel.getUserDisplayName()
-
     Scaffold(
         topBar = {
-            HomeTopAppBar {
+            HomeTopAppBar(
+                onRefreshClicked = { newHomeViewModel.getAllBooks() }
+            ) {
                 viewModel.signOut().run {
                     navController.navigate(route = ReaderScreens.LoginScreen.name) {
                         popUpTo(navController.graph.id) {
@@ -83,7 +87,8 @@ fun HomeScreen(
                 .padding(paddingValues = paddingValues)
                 .fillMaxSize()
         ) {
-            HomeContent(navController, displayName = displayName)
+            // HomeContent(navController, viewModel)
+            HomeContent(navController, newHomeViewModel)
         }
     }
 }
@@ -107,8 +112,22 @@ private fun FABAddBook(onFABClicked: () -> Unit) {
 @Composable
 fun HomeContent(
     navController: NavController,
-    modifier: Modifier = Modifier,
-    displayName: String
+    viewModel: NewHomeViewModel,
+    modifier: Modifier = Modifier
+) {
+    val displayName = viewModel.getUserDisplayName()
+    val listOfBooks: List<ReadingBook> = viewModel.getReadingBookList()
+
+    if (listOfBooks.isEmpty()) ShowProgressIndicator()
+    else ShowHomeScreen(modifier, displayName, navController, listOfBooks)
+}
+
+@Composable
+private fun ShowHomeScreen(
+    modifier: Modifier,
+    displayName: String,
+    navController: NavController,
+    listOfBooks: List<ReadingBook>
 ) {
     Column(
         modifier = modifier
@@ -119,12 +138,10 @@ fun HomeContent(
         TitleSection(modifier, displayName) {
             navController.navigate(route = ReaderScreens.ReaderStatsScreen.name)
         }
-        BookCard(book = getBook()) {
-            // Todo("Card OnClick impl")
-        }
+        ReadingBookList(navController, listOfBooks)
         Spacer(modifier = Modifier.height(12.dp))
         TitleText("Reading List")
-        ReadingList(listOfBooks = listOf(getBook(), getBook(), getBook()))
+        ReadingBookList(navController, listOfBooks)
     }
 }
 
@@ -175,7 +192,7 @@ fun BookCard(book: ReadingBook, onClick: (String?) -> Unit = {}) {
         elevation = CardDefaults.cardElevation(6.dp),
     ) {
         Column {
-            BookImageAndRating(imageUrl = "", rating = 4.5.toString())
+            BookImageAndRating(imageUrl = book.photoUrl, rating = book.averageRating ?: "N/A")
             BookTitleAndAuthor(book.title, book.authors)
             Row(
                 modifier = Modifier.fillMaxWidth(),
@@ -189,7 +206,9 @@ fun BookCard(book: ReadingBook, onClick: (String?) -> Unit = {}) {
 }
 
 @Composable
-private fun BookImageAndRating(imageUrl: String, rating: String) {
+private fun BookImageAndRating(imageUrl: String?, rating: String) {
+    val photoUrl = imageUrl ?: stringResource(R.string.stock_image_unsplash_url)
+
     Row(
         modifier = Modifier
             .fillMaxWidth()
@@ -198,11 +217,11 @@ private fun BookImageAndRating(imageUrl: String, rating: String) {
         verticalAlignment = Alignment.CenterVertically
     ) {
         Image(
-            painter = painterResource(id = R.drawable.books_unsplash),
+            painter = rememberAsyncImagePainter(model = photoUrl),
+            contentDescription = stringResource(R.string.book_image),
             modifier = Modifier
                 .width(200.dp)
                 .fillMaxHeight(),
-            contentDescription = stringResource(R.string.book_image),
             contentScale = ContentScale.Crop
         )
         BookRating(rating)
@@ -210,7 +229,7 @@ private fun BookImageAndRating(imageUrl: String, rating: String) {
 }
 
 @Composable
-fun BookRating(rating: String = "4.0") {
+fun BookRating(rating: String) {
     Column(
         modifier = Modifier.padding(end = 8.dp),
         verticalArrangement = Arrangement.Center,
@@ -233,7 +252,8 @@ fun BookRating(rating: String = "4.0") {
             ) {
                 Icon(
                     imageVector = Icons.Rounded.Star,
-                    contentDescription = stringResource(R.string.star_icon)
+                    contentDescription = stringResource(R.string.star_icon),
+                    tint = Color(0xFFFFD700)
                 )
                 Text(
                     text = rating, style = MaterialTheme.typography.headlineSmall
@@ -252,7 +272,7 @@ private fun BookTitleAndAuthor(title: String?, author: String?) {
     ) {
         Text(
             text = title ?: "Book Title",
-            style = MaterialTheme.typography.headlineMedium,
+            style = MaterialTheme.typography.headlineSmall,
             fontWeight = FontWeight.SemiBold,
             maxLines = 1,
             overflow = TextOverflow.Ellipsis
@@ -267,11 +287,11 @@ private fun BookTitleAndAuthor(title: String?, author: String?) {
 }
 
 @Composable
-fun ReadingList(listOfBooks: List<ReadingBook>) {
+fun ReadingBookList(navController: NavController, listOfBooks: List<ReadingBook>) {
     LazyRow {
         items(items = listOfBooks) {
-            BookCard(book = it) {
-                // TODO("Card OnClick impl")
+            BookCard(book = it) { bookId ->
+                navController.navigate(ReaderScreens.UpdateScreen.name + "/$bookId")
             }
         }
     }

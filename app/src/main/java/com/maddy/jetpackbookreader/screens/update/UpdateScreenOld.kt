@@ -1,3 +1,4 @@
+/*
 package com.maddy.jetpackbookreader.screens.update
 
 import android.content.Context
@@ -10,21 +11,15 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.rounded.Info
-import androidx.compose.material3.AlertDialog
-import androidx.compose.material3.Icon
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Surface
-import androidx.compose.material3.Text
-import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
@@ -42,7 +37,7 @@ import com.maddy.jetpackbookreader.widgets.BookRatingBar
 import com.maddy.jetpackbookreader.widgets.ReaderTopAppBar
 
 @Composable
-fun UpdateScreen(
+fun UpdateScreenOld(
     navController: NavController,
     viewModel: HomeViewModel = hiltViewModel(),
     newHomeViewModel: NewHomeViewModel = hiltViewModel(),
@@ -75,8 +70,6 @@ fun ShowUpdateScreen(
     newHomeViewModel: NewHomeViewModel,
     book: ReadingBook = getBook()
 ) {
-    val context = LocalContext.current
-
     val yourRating = book.yourRating?.toDouble()?.toInt() ?: 0
     val ratingState = rememberSaveable { mutableIntStateOf(yourRating) }
     val noteState = rememberSaveable { mutableStateOf("") }
@@ -87,18 +80,6 @@ fun ShowUpdateScreen(
     val updateFinishReadingState = rememberSaveable { mutableStateOf(false) }
     val updateNoteState = rememberSaveable { mutableStateOf(false) }
 
-    // Get Map of updates from ViewModel
-    // Every time "updates" variable is called it will call "constructUpdates" in Viewmodel
-    val updates = newHomeViewModel.constructUpdates(
-        book,
-        ratingState.value,
-        updateRatingState.value,
-        updateStartReadingState.value,
-        updateFinishReadingState.value,
-        noteState.value,
-        updateNoteState.value
-    )
-
     Column(
         modifier = Modifier
             .fillMaxSize()
@@ -108,16 +89,19 @@ fun ShowUpdateScreen(
     ) {
 
         UpdateAndDeleteButton(
-            onUpdateClick = {
-                updateBook(navController, newHomeViewModel, context, book, updates)
-            },
-            onDeleteClick = {
-                deleteBook(navController, newHomeViewModel, context, book)
-            }
+            navController,
+            newHomeViewModel,
+            book,
+            ratingState,
+            updateRatingState,
+            updateStartReadingState,
+            updateFinishReadingState,
+            noteState,
+            updateNoteState,
         )
         BookImageAndTitle(book) { navController.navigate(ReaderScreens.BookDetailsScreen.name + "/${book.googleBookId}") }
         BookRatingBar(text = "Your Rating", rating = yourRating) { newRating ->
-            if (newRating != ratingState.intValue) {
+            if (newRating != ratingState.intValue){
                 ratingState.intValue = newRating
                 updateRatingState.value = true
             }
@@ -135,7 +119,25 @@ fun ShowUpdateScreen(
 }
 
 @Composable
-fun UpdateAndDeleteButton(onUpdateClick: () -> Unit, onDeleteClick:() -> Unit) {
+fun UpdateAndDeleteButton(
+    navController: NavController,
+    newHomeViewModel: NewHomeViewModel,
+    book: ReadingBook,
+    ratingState: MutableState<Int>,
+    updateRatingState: MutableState<Boolean>,
+    updateStartReadingState: MutableState<Boolean>,
+    updateFinishReadingState: MutableState<Boolean>,
+    noteState: MutableState<String>,
+    updateNoteState: MutableState<Boolean>,
+) {
+    val context = LocalContext.current
+
+    // if true - then will update the book with new changes
+    val updateBook = updateRatingState.value
+            || updateStartReadingState.value
+            || updateFinishReadingState.value
+            || updateNoteState.value
+
     Row(
         modifier = Modifier
             .padding(12.dp)
@@ -143,73 +145,43 @@ fun UpdateAndDeleteButton(onUpdateClick: () -> Unit, onDeleteClick:() -> Unit) {
         horizontalArrangement = Arrangement.SpaceEvenly,
         verticalAlignment = Alignment.CenterVertically
     ) {
-        // Update Button
         RoundedButton(text = "Update") {
-            onUpdateClick()
-        }
-
-        // Delete Button
-        val openAlertDialog = rememberSaveable { mutableStateOf(false) }
-        when {
-            openAlertDialog.value -> {
-                ShowAlertDialog(
-                    dialogTitle = stringResource(id = R.string.are_you_sure),
-                    dialogText = stringResource(id = R.string.action_not_reversible),
-                    icon = Icons.Rounded.Info,
-                    onDismissRequest = { openAlertDialog.value = false },
-                    onConfirmation = {
-                        openAlertDialog.value = false
-                        onDeleteClick()         // Add logic here to handle confirmation.
+            if (updateBook) {
+                newHomeViewModel.updateBookInDatabase(
+                    book,
+                    book.id,
+                    ratingState.value,
+                    noteState.value,
+                    updateRatingState.value,
+                    updateStartReadingState.value,
+                    updateFinishReadingState.value,
+                    updateNoteState.value,
+                ) { updateSuccessful ->
+                    if (updateSuccessful) {
+                        Toast
+                            .makeText(context, "Book Updated Successfully", Toast.LENGTH_SHORT)
+                            .show()
+                        navController.navigate(ReaderScreens.HomeScreen.name) {
+                            popUpTo(navController.graph.id) { inclusive = true }
+                        }
+                    } else {
+                        Toast
+                            .makeText(context, "Book Update Failed", Toast.LENGTH_SHORT)
+                            .show()
                     }
-                )
+                }
             }
+
+            updateBook(navController, newHomeViewModel, book, updates, context)
+
         }
-        RoundedButton(text = "Delete") { openAlertDialog.value = true }
+        RoundedButton(text = "Delete")
     }
 }
 
-@Composable
-fun ShowAlertDialog(
-    dialogTitle: String,
-    dialogText: String,
-    icon: ImageVector,
-    onDismissRequest: () -> Unit,
-    onConfirmation: () -> Unit
-) {
-    AlertDialog(
-        icon = {
-            Icon(
-                imageVector = icon,
-                contentDescription = stringResource(R.string.alert_dialog_icon)
-            )
-        },
-        title = { Text(text = dialogTitle) },
-        text = { Text(text = dialogText) },
-        onDismissRequest = { onDismissRequest() },
-        confirmButton = {
-            TextButton(
-                onClick = { onConfirmation() }
-            ) {
-                Text("Confirm")
-            }
-        },
-        dismissButton = {
-            TextButton(
-                onClick = { onDismissRequest() }
-            ) {
-                Text("Dismiss")
-            }
-        }
-    )
-}
 
-fun updateBook(
-    navController: NavController,
-    newHomeViewModel: NewHomeViewModel,
-    context: Context,
-    book: ReadingBook,
-    updates: Map<String, Any?>,
-) {
+fun updateBook(navController: NavController, newHomeViewModel: NewHomeViewModel, book: ReadingBook, updates: Map<String, Any?>, context: Context,) {
+
     newHomeViewModel.updateBookInFirestore(book.id, updates) { updateSuccessful ->
         // Handle update result
         if (updateSuccessful) {
@@ -223,24 +195,54 @@ fun updateBook(
             Toast.makeText(context, "Book Update Failed", Toast.LENGTH_SHORT).show()
         }
     }
-}
+}*/
 
-fun deleteBook(
-    navController: NavController,
-    newHomeViewModel: NewHomeViewModel,
-    context: Context,
-    book: ReadingBook
-) {
-    newHomeViewModel.deleteBook(book) { deleteSuccessful ->
-        if (deleteSuccessful) {
-            // Delete successful
-            Toast.makeText(context, "Book Deleted Successfully", Toast.LENGTH_SHORT).show()
-            navController.navigate(ReaderScreens.HomeScreen.name) {
-                popUpTo(navController.graph.id) { inclusive = true }
-            }
-        } else {
-            // Delete failed
-            Toast.makeText(context, "Book Delete Failed", Toast.LENGTH_SHORT).show()
+
+/*
+// viewModel functions
+
+fun updateBookInDatabase(
+        book: ReadingBook,
+        bookId: String?,
+        rating: Int,
+        note: String,
+        updateRating: Boolean,
+        updateStartReading: Boolean,
+        updateFinishReading: Boolean,
+        updateNotes: Boolean,
+        onUpdateComplete: (Boolean) -> Unit
+    ) {
+        if (updateRating) {
+            val bookToUpdate = hashMapOf("your_rating" to rating.toString()).toMap()
+            firebaseUpdate(bookId, bookToUpdate) { onUpdateComplete(it) }
+        }
+        if (updateStartReading) {
+            val bookToUpdate = hashMapOf("started_reading_at" to Timestamp.now()).toMap()
+            firebaseUpdate(bookId, bookToUpdate) { onUpdateComplete(it) }
+        }
+        if (updateFinishReading) {
+            val bookToUpdate = hashMapOf("finished_reading_at" to Timestamp.now()).toMap()
+            firebaseUpdate(bookId, bookToUpdate) { onUpdateComplete(it) }
+        }
+        if (updateNotes) {
+            val mutableNotes = book.notes?.toMutableList() ?: mutableListOf()
+            mutableNotes.add(0, note)
+            val newNotes: List<String>? = mutableNotes
+
+            val bookToUpdate = hashMapOf("notes" to newNotes).toMap()
+            firebaseUpdate(bookId, bookToUpdate) { onUpdateComplete(it) }
         }
     }
-}
+
+    private fun firebaseUpdate(
+        bookId: String?,
+        bookToUpdate: Map<String, Any?>,
+        onUpdateComplete: (Boolean) -> Unit
+    ) {
+        FirebaseFirestore.getInstance()
+            .collection("books")
+            .document(bookId!!)
+            .update(bookToUpdate)       // the update(map) takes a Map<k,v> as parameter
+            .addOnCompleteListener { onUpdateComplete(true) }
+            .addOnFailureListener { onUpdateComplete(false) }
+    }*/
