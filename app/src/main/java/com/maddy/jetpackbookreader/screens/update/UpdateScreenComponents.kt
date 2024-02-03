@@ -157,7 +157,7 @@ fun StartReadingCard(updateStartReadingState: MutableState<Boolean>, book: Readi
                     color = MaterialTheme.colorScheme.secondaryContainer,
                 ) {
                     Text(
-                        text = "${formatDate(book.startedReading) ?: "start date"}",
+                        text = "${formatDate(book.startedReading) ?: "Not Yet"}",
                         style = MaterialTheme.typography.labelSmall,
                         color = MaterialTheme.colorScheme.tertiary,
                         modifier = Modifier.padding(horizontal = 12.dp, vertical = 4.dp)
@@ -219,7 +219,7 @@ fun FinishReadingCard(updateFinishReadingState: MutableState<Boolean>, book: Rea
                     color = MaterialTheme.colorScheme.secondaryContainer,
                 ) {
                     Text(
-                        text = "${formatDate(book.finishedReading) ?: "finish date"}",
+                        text = "${formatDate(book.finishedReading) ?: "Not Yet"}",
                         style = MaterialTheme.typography.labelSmall,
                         color = MaterialTheme.colorScheme.tertiary,
                         modifier = Modifier.padding(horizontal = 12.dp, vertical = 4.dp)
