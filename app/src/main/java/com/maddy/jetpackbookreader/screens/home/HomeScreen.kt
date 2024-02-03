@@ -126,7 +126,7 @@ fun HomeContent(
         ShowProgressIndicator()
     } else {
         if (listOfBooks.isNullOrEmpty()) NoBookFoundText(navController)
-        else ShowHomeScreen(modifier, displayName, navController, listOfBooks)
+        else ShowHomeScreen(modifier, displayName, navController, viewModel, listOfBooks)
     }
 }
 
@@ -149,6 +149,7 @@ private fun ShowHomeScreen(
     modifier: Modifier,
     displayName: String,
     navController: NavController,
+    viewModel: NewHomeViewModel,
     listOfBooks: List<ReadingBook>
 ) {
     Column(
@@ -160,10 +161,10 @@ private fun ShowHomeScreen(
         TitleSection(modifier, displayName) {
             navController.navigate(route = ReaderScreens.ReaderStatsScreen.name)
         }
-        ReadingBookList(navController, listOfBooks)
+        ReadingNowBookList(navController, viewModel, listOfBooks)
         Spacer(modifier = Modifier.height(12.dp))
         TitleText("Added List")
-        AddedBookList(navController, listOfBooks)
+        AddedBookList(navController, viewModel, listOfBooks)
     }
 }
 
@@ -309,15 +310,16 @@ private fun BookTitleAndAuthor(title: String?, author: String?) {
 }
 
 @Composable
-fun ReadingBookList(navController: NavController, listOfBooks: List<ReadingBook>) {
-    val readingBooks = listOfBooks.filter { book ->
-        book.startedReading != null && book.finishedReading == null
-    }
+fun ReadingNowBookList(
+    navController: NavController,
+    viewModel: NewHomeViewModel,
+    listOfBooks: List<ReadingBook>
+) {
+    val readingBooks = viewModel.getReadingNowBookList(listOfBooks)
 
     if (readingBooks.isNullOrEmpty()) {
         ShowText(text = "Start Reading a Book")
     } else {
-
         LazyRow {
             items(items = readingBooks) {
                 BookCard(book = it, buttonText = "Reading") { bookId ->
@@ -329,23 +331,24 @@ fun ReadingBookList(navController: NavController, listOfBooks: List<ReadingBook>
 }
 
 @Composable
-fun AddedBookList(navController: NavController, listOfBooks: List<ReadingBook>) {
-    val addedBooks = listOfBooks.filter { book ->
-        book.startedReading == null && book.finishedReading == null
-    }
+fun AddedBookList(
+    navController: NavController,
+    viewModel: NewHomeViewModel,
+    listOfBooks: List<ReadingBook>
+) {
+    val addedBooksList = viewModel.getAddedBookList(listOfBooks)
 
-    if (addedBooks.isNullOrEmpty()) {
+    if (addedBooksList.isNullOrEmpty()) {
         ShowText(text = "Add a Book")
     } else {
         LazyRow {
-            items(items = addedBooks) {
+            items(items = addedBooksList) {
                 BookCard(book = it, buttonText = "Added") { bookId ->
                     navController.navigate(ReaderScreens.UpdateScreen.name + "/$bookId")
                 }
             }
         }
     }
-
 }
 
 

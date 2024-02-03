@@ -55,6 +55,22 @@ class NewHomeViewModel @Inject constructor(private val repository: NewFireReposi
         } else emptyList<ReadingBook>()
     }
 
+    fun getReadingNowBookList(listOfBooks: List<ReadingBook>) =
+        listOfBooks.filter { book ->
+            book.startedReading != null && book.finishedReading == null
+        }
+
+    fun getAddedBookList(listOfBooks: List<ReadingBook>) =
+        listOfBooks.filter { book ->
+            book.startedReading == null && book.finishedReading == null
+        }
+
+    fun getFinishBookList(listOfBooks: List<ReadingBook>) =
+        listOfBooks.filter { book ->
+            book.startedReading != null && book.finishedReading != null
+        }
+
+
     fun getBookById(bookId: String): ReadingBook {
         return if (errorStateFlow.value == null)
             bookListStateFlow.value.firstOrNull { it.id == bookId } ?: ReadingBook()
