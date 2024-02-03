@@ -27,7 +27,7 @@ fun HomeTopAppBar(modifier: Modifier = Modifier, onRefreshClicked:() -> Unit = {
     CenterAlignedTopAppBar(
         title = {
             Text(
-                text = "Book Reader",
+                text = stringResource(id = R.string.app_name),
                 style = MaterialTheme.typography.titleLarge,
                 color = MaterialTheme.colorScheme.primary,
                 fontWeight = FontWeight.SemiBold,

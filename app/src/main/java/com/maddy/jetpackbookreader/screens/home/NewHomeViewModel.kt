@@ -108,4 +108,13 @@ class NewHomeViewModel @Inject constructor(private val repository: NewFireReposi
             .addOnCompleteListener { onUpdateComplete(true) }
             .addOnFailureListener { onUpdateComplete(false) }
     }
+
+    fun deleteBook(book: ReadingBook, onDeleteComplete: (Boolean) -> Unit) {
+        FirebaseFirestore.getInstance()
+            .collection("books")
+            .document(book.id!!)
+            .delete()
+            .addOnCompleteListener { onDeleteComplete(true) }
+            .addOnFailureListener { onDeleteComplete(false) }
+    }
 }

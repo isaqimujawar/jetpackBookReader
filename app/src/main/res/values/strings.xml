@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">Jetpack Book Reader</string>
+    <string name="app_name">Reading Tracker</string>
     <string name="logo_title">Book Reader App</string>
     <string name="logo_motto">\"Read. Change. Yourself\"</string>
     <string name="back_arrow_icon">Back Arrow Icon</string>
@@ -37,4 +37,7 @@
     <string name="add_note">Add Notes, Last Page Read, Bookmarks</string>
     <string name="enter_your_thoughts">Enter Your Thoughts</string>
     <string name="rating">Rating</string>
+    <string name="are_you_sure">Are you sure you want to delete this book?</string>
+    <string name="action_not_reversible">This action is not reversible</string>
+    <string name="alert_dialog_icon">alert dialog icon</string>
 </resources>
