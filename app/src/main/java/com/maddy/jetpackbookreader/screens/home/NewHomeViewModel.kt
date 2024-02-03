@@ -59,48 +59,52 @@ class NewHomeViewModel @Inject constructor(private val repository: NewFireReposi
             ReadingBook()
     }
 
-    fun updateBookInDatabase(
+    // Function to construct updates map based on user changes
+    fun constructUpdates(
         book: ReadingBook,
-        bookId: String?,
-        rating: Int,
-        note: String,
-        updateRating: Boolean,
-        updateStartReading: Boolean,
-        updateFinishReading: Boolean,
-        updateNotes: Boolean,
-        onUpdateComplete: (Boolean) -> Unit
-    ) {
-        if (updateRating) {
-            val bookToUpdate = hashMapOf("your_rating" to rating.toString()).toMap()
-            firebaseUpdate(bookId, bookToUpdate) { onUpdateComplete(it) }
+        ratingState: Int,
+        updateRatingState: Boolean,
+        updateStartReadingState: Boolean,
+        updateFinishReadingState: Boolean,
+        noteState: String,
+        updateNoteState: Boolean
+    ): Map<String, Any?> {
+        val updates = mutableMapOf<String, Any?>()
+        if (updateRatingState) {
+            updates["your_rating"] = ratingState.toString()
         }
-        if (updateStartReading) {
-            val bookToUpdate = hashMapOf("started_reading_at" to Timestamp.now()).toMap()
-            firebaseUpdate(bookId, bookToUpdate) { onUpdateComplete(it) }
+        if (updateStartReadingState) {
+            updates["started_reading_at"] = Timestamp.now()
         }
-        if (updateFinishReading) {
-            val bookToUpdate = hashMapOf("finished_reading_at" to Timestamp.now()).toMap()
-            firebaseUpdate(bookId, bookToUpdate) { onUpdateComplete(it) }
+        if (updateFinishReadingState) {
+            updates["finished_reading_at"] = Timestamp.now()
         }
-        if (updateNotes) {
-            val mutableNotes = book.notes?.toMutableList() ?: mutableListOf()
-            mutableNotes.add(0, note)
-            val newNotes: List<String>? = mutableNotes
-
-            val bookToUpdate = hashMapOf("notes" to newNotes).toMap()
-            firebaseUpdate(bookId, bookToUpdate) { onUpdateComplete(it) }
+        if (updateNoteState) {
+            val newNote = noteState.trim()
+            if (newNote.isNotEmpty()) {
+                val mutableNotes = (book.notes ?: emptyList()).toMutableList()
+                mutableNotes.add(0, newNote)
+                updates["notes"] = mutableNotes
+            }
         }
+        return updates
     }
 
-    private fun firebaseUpdate(
+    fun updateBookInFirestore(
         bookId: String?,
-        bookToUpdate: Map<String, Any?>,
+        updates: Map<String, Any?>,
         onUpdateComplete: (Boolean) -> Unit
     ) {
+        if (updates.isEmpty()) {
+            // No updates required
+            onUpdateComplete(false)
+            return
+        }
+
         FirebaseFirestore.getInstance()
             .collection("books")
             .document(bookId!!)
-            .update(bookToUpdate)
+            .update(updates)
             .addOnCompleteListener { onUpdateComplete(true) }
             .addOnFailureListener { onUpdateComplete(false) }
     }
