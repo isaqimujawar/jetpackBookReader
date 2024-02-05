@@ -96,7 +96,7 @@ class BookDetailsViewModel @Inject constructor(
         val volumeInfo = bookItem.volumeInfo
         val averageRating =
             if (volumeInfo?.averageRating == null) "0.0" else volumeInfo.averageRating.toString()
-        val yourRating = "0.0"
+        val yourRating = "0"
 
         return ReadingBook(
             title = volumeInfo?.title.toString(),
