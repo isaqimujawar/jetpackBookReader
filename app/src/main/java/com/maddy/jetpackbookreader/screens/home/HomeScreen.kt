@@ -253,12 +253,13 @@ private fun BookImageAndRating(imageUrl: String?, rating: String) {
 
 @Composable
 fun BookRating(rating: String) {
+    val yourRating = rating.toDouble().toInt()
     Column(
         modifier = Modifier.padding(end = 8.dp),
         verticalArrangement = Arrangement.Center,
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
-        ShowFavoriteIcon(rating = rating.toDouble().toInt())
+        ShowFavoriteIcon(rating = yourRating)
         Spacer(modifier = Modifier.height(16.dp))
         Surface(
             shape = RoundedCornerShape(56.dp),
@@ -275,7 +276,7 @@ fun BookRating(rating: String) {
                     tint = Color(0xFFFFD700)
                 )
                 Text(
-                    text = "${rating}.0", style = MaterialTheme.typography.headlineSmall
+                    text = "${yourRating}.0", style = MaterialTheme.typography.headlineSmall
                 )
             }
         }
