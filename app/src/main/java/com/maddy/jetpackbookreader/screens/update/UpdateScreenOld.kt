@@ -30,8 +30,8 @@ import com.maddy.jetpackbookreader.components.RoundedButton
 import com.maddy.jetpackbookreader.components.ShowProgressIndicator
 import com.maddy.jetpackbookreader.model.ReadingBook
 import com.maddy.jetpackbookreader.navigation.ReaderScreens
-import com.maddy.jetpackbookreader.screens.home.HomeViewModel
-import com.maddy.jetpackbookreader.screens.home.NewHomeViewModel
+import com.maddy.jetpackbookreader.screens.home.viewModelOld.HomeViewModel
+import com.maddy.jetpackbookreader.screens.home.viewModelOld.NewHomeViewModel
 import com.maddy.jetpackbookreader.utils.getBook
 import com.maddy.jetpackbookreader.widgets.BookRatingBar
 import com.maddy.jetpackbookreader.widgets.ReaderTopAppBar

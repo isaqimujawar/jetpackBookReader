@@ -8,8 +8,8 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.maddy.jetpackbookreader.data.Response
 import com.maddy.jetpackbookreader.model.Item
-import com.maddy.jetpackbookreader.repository.BookRepository
-import com.maddy.jetpackbookreader.repository.RemoteBookRepository
+import com.maddy.jetpackbookreader.repositoryOld.BookRepository
+import com.maddy.jetpackbookreader.repositoryOld.RemoteBookRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch

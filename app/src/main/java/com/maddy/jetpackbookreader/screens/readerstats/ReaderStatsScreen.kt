@@ -47,7 +47,7 @@ import com.maddy.jetpackbookreader.R
 import com.maddy.jetpackbookreader.components.ShowProgressIndicator
 import com.maddy.jetpackbookreader.model.ReadingBook
 import com.maddy.jetpackbookreader.navigation.ReaderScreens
-import com.maddy.jetpackbookreader.screens.home.NewHomeViewModel
+import com.maddy.jetpackbookreader.screens.home.viewModelOld.NewHomeViewModel
 import com.maddy.jetpackbookreader.utils.formatDate
 import com.maddy.jetpackbookreader.widgets.ReaderTopAppBar
 

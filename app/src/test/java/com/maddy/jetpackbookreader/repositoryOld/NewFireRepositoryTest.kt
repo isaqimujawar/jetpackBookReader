@@ -1,4 +1,4 @@
-package com.maddy.jetpackbookreader.repository
+package com.maddy.jetpackbookreader.repositoryOld
 
 class NewFireRepositoryTest {
    /* @MockK

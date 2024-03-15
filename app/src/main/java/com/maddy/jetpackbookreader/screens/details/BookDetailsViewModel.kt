@@ -9,8 +9,8 @@ import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
 import com.maddy.jetpackbookreader.model.Item
 import com.maddy.jetpackbookreader.model.ReadingBook
-import com.maddy.jetpackbookreader.repository.BookRepository
-import com.maddy.jetpackbookreader.repository.NewFireRepository
+import com.maddy.jetpackbookreader.repositoryOld.BookRepository
+import com.maddy.jetpackbookreader.repositoryOld.NewFireRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow

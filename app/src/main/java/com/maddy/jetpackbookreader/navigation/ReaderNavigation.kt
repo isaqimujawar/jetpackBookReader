@@ -10,8 +10,8 @@ import androidx.navigation.navArgument
 import com.maddy.jetpackbookreader.screens.details.BookDetailsScreen
 import com.maddy.jetpackbookreader.screens.details.BookDetailsViewModel
 import com.maddy.jetpackbookreader.screens.home.HomeScreen
-import com.maddy.jetpackbookreader.screens.home.HomeViewModel
-import com.maddy.jetpackbookreader.screens.home.NewHomeViewModel
+import com.maddy.jetpackbookreader.screens.home.viewModelOld.HomeViewModel
+import com.maddy.jetpackbookreader.screens.home.viewModelOld.NewHomeViewModel
 import com.maddy.jetpackbookreader.screens.login.CreateAccountScreen
 import com.maddy.jetpackbookreader.screens.login.LoginScreen
 import com.maddy.jetpackbookreader.screens.login.LoginViewModel
@@ -44,7 +44,8 @@ fun ReaderNavigation() {
         composable(route = ReaderScreens.HomeScreen.name) {
             val homeViewModel = hiltViewModel<HomeViewModel>()
             val newHomeViewModel = hiltViewModel<NewHomeViewModel>()
-            HomeScreen(navController = navController, viewModel = homeViewModel, newHomeViewModel= newHomeViewModel)
+            val stateFlowViewModel = hiltViewModel<com.maddy.jetpackbookreader.screens.home.HomeViewModel>()
+            HomeScreen(navController = navController, viewModel = homeViewModel, homeViewModel= stateFlowViewModel)
         }
         composable(route = ReaderScreens.SearchScreen.name) {
             val searchViewModel = hiltViewModel<SearchViewModel>()

@@ -1,4 +1,4 @@
-package com.maddy.jetpackbookreader.screens.home
+package com.maddy.jetpackbookreader.screens.home.viewModelOld
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -6,7 +6,7 @@ import com.google.firebase.Timestamp
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
 import com.maddy.jetpackbookreader.model.ReadingBook
-import com.maddy.jetpackbookreader.repository.NewFireRepository
+import com.maddy.jetpackbookreader.repositoryOld.NewFireRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch

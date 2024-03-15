@@ -2,12 +2,13 @@ package com.maddy.jetpackbookreader.di
 
 import com.google.firebase.firestore.FirebaseFirestore
 import com.maddy.jetpackbookreader.network.BooksApi
-import com.maddy.jetpackbookreader.repository.BookRepository
-import com.maddy.jetpackbookreader.repository.BookRepositoryImpl
-import com.maddy.jetpackbookreader.repository.FireRepository
-import com.maddy.jetpackbookreader.repository.NewFireRepository
-import com.maddy.jetpackbookreader.repository.RemoteBookRepository
-import com.maddy.jetpackbookreader.repository.RemoteBookRepositoryImpl
+import com.maddy.jetpackbookreader.repository.FlowRepository
+import com.maddy.jetpackbookreader.repositoryOld.BookRepository
+import com.maddy.jetpackbookreader.repositoryOld.BookRepositoryImpl
+import com.maddy.jetpackbookreader.repositoryOld.FireRepository
+import com.maddy.jetpackbookreader.repositoryOld.NewFireRepository
+import com.maddy.jetpackbookreader.repositoryOld.RemoteBookRepository
+import com.maddy.jetpackbookreader.repositoryOld.RemoteBookRepositoryImpl
 import com.maddy.jetpackbookreader.utils.ReaderConstants
 import dagger.Module
 import dagger.Provides
@@ -48,4 +49,9 @@ object AppModule {
     @Provides
     fun provideNewFireRepository() =
         NewFireRepository(firestoreQuery = FirebaseFirestore.getInstance().collection("books"))
+
+    @Singleton
+    @Provides
+    fun provideFlowRepository() =
+        FlowRepository(firestoreQuery = FirebaseFirestore.getInstance().collection("books"))
 }

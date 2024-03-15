@@ -54,6 +54,8 @@ import com.maddy.jetpackbookreader.components.ShowText
 import com.maddy.jetpackbookreader.components.TitleText
 import com.maddy.jetpackbookreader.model.ReadingBook
 import com.maddy.jetpackbookreader.navigation.ReaderScreens
+import com.maddy.jetpackbookreader.screens.home.viewModelOld.HomeViewModel
+import com.maddy.jetpackbookreader.screens.home.viewModelOld.NewHomeViewModel
 import com.maddy.jetpackbookreader.ui.theme.JetpackBookReaderTheme
 import com.maddy.jetpackbookreader.utils.getBook
 import com.maddy.jetpackbookreader.widgets.HomeTopAppBar
@@ -62,12 +64,13 @@ import com.maddy.jetpackbookreader.widgets.HomeTopAppBar
 fun HomeScreen(
     navController: NavController,
     viewModel: HomeViewModel = hiltViewModel(),
-    newHomeViewModel: NewHomeViewModel = hiltViewModel()
+    homeViewModel: com.maddy.jetpackbookreader.screens.home.HomeViewModel = hiltViewModel()
 ) {
     Scaffold(
         topBar = {
             HomeTopAppBar(
-                onRefreshClicked = { newHomeViewModel.getAllBooks() }
+                // onRefreshClicked = { newHomeViewModel.getAllBooks() }
+                onRefreshClicked = { homeViewModel.bookList.value }
             ) {
                 viewModel.signOut().run {
                     navController.navigate(route = ReaderScreens.LoginScreen.name) {
@@ -90,7 +93,7 @@ fun HomeScreen(
                 .fillMaxSize()
         ) {
             // HomeContent(navController, viewModel)
-            HomeContent(navController, newHomeViewModel)
+            HomeContent(navController, homeViewModel)
         }
     }
 }
@@ -114,19 +117,22 @@ private fun FABAddBook(onFABClicked: () -> Unit) {
 @Composable
 fun HomeContent(
     navController: NavController,
-    viewModel: NewHomeViewModel,
+    viewModel: com.maddy.jetpackbookreader.screens.home.HomeViewModel,
     modifier: Modifier = Modifier
 ) {
     val displayName = viewModel.getUserDisplayName()
-    val listOfBooks: List<ReadingBook> = viewModel.getReadingBookList()
-    val loading = viewModel.loadingStateFlow.collectAsStateWithLifecycle()
+    val listOfBooks = viewModel.bookList.collectAsStateWithLifecycle()
+    // val listOfBooks: List<ReadingBook> = viewModel.getReadingBookList()
+    //val loading = viewModel.loadingStateFlow.collectAsStateWithLifecycle()
+    val loading = false
 
     // if (listOfBooks.isEmpty()) ShowProgressIndicator()
-    if (loading.value) {
+    if (loading) {
         ShowProgressIndicator()
     } else {
-        if (listOfBooks.isNullOrEmpty()) NoBookFoundText(navController)
-        else ShowHomeScreen(modifier, displayName, navController, viewModel, listOfBooks)
+       /* if (listOfBooks.isNullOrEmpty()) NoBookFoundText(navController)
+        else ShowHomeScreen(modifier, displayName, navController, viewModel, listOfBooks)*/
+
     }
 }
 
