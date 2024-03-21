@@ -1,7 +1,7 @@
 package com.maddy.jetpackbookreader.network
 
-import com.maddy.jetpackbookreader.model.BooksVolume
-import com.maddy.jetpackbookreader.model.Item
+import com.maddy.jetpackbookreader.common.model.BooksVolume
+import com.maddy.jetpackbookreader.common.model.Item
 import retrofit2.http.GET
 import retrofit2.http.Path
 import retrofit2.http.Query

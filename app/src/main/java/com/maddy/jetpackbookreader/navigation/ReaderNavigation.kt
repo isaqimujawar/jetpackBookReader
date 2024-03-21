@@ -7,19 +7,18 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
-import com.maddy.jetpackbookreader.screens.details.BookDetailsScreen
-import com.maddy.jetpackbookreader.screens.details.BookDetailsViewModel
-import com.maddy.jetpackbookreader.screens.home.HomeScreen
-import com.maddy.jetpackbookreader.screens.home.HomeViewModel
-import com.maddy.jetpackbookreader.screens.home.NewHomeViewModel
-import com.maddy.jetpackbookreader.screens.login.CreateAccountScreen
-import com.maddy.jetpackbookreader.screens.login.LoginScreen
-import com.maddy.jetpackbookreader.screens.login.LoginViewModel
-import com.maddy.jetpackbookreader.screens.readerstats.ReaderStatsScreen
-import com.maddy.jetpackbookreader.screens.search.SearchScreen
-import com.maddy.jetpackbookreader.screens.search.SearchViewModel
-import com.maddy.jetpackbookreader.screens.splash.SplashScreen
-import com.maddy.jetpackbookreader.screens.update.UpdateScreen
+import com.maddy.jetpackbookreader.features.auth.presentation.CreateAccountScreen
+import com.maddy.jetpackbookreader.features.auth.presentation.LoginScreen
+import com.maddy.jetpackbookreader.features.auth.presentation.LoginViewModel
+import com.maddy.jetpackbookreader.features.bookdetails.presentation.BookDetailsScreen
+import com.maddy.jetpackbookreader.features.bookdetails.presentation.BookDetailsViewModel
+import com.maddy.jetpackbookreader.features.home.presentation.HomeScreen
+import com.maddy.jetpackbookreader.features.home.presentation.NewHomeViewModel
+import com.maddy.jetpackbookreader.features.profile.presentation.ReaderStatsScreen
+import com.maddy.jetpackbookreader.features.search.presentation.SearchScreen
+import com.maddy.jetpackbookreader.features.search.presentation.SearchViewModel
+import com.maddy.jetpackbookreader.features.splash.presentation.SplashScreen
+import com.maddy.jetpackbookreader.features.updatebook.presentation.UpdateScreen
 
 @Composable
 fun ReaderNavigation() {
@@ -42,9 +41,8 @@ fun ReaderNavigation() {
             CreateAccountScreen(navController = navController, viewModel = loginViewModel)
         }
         composable(route = ReaderScreens.HomeScreen.name) {
-            val homeViewModel = hiltViewModel<HomeViewModel>()
             val newHomeViewModel = hiltViewModel<NewHomeViewModel>()
-            HomeScreen(navController = navController, viewModel = homeViewModel, newHomeViewModel= newHomeViewModel)
+            HomeScreen(navController = navController, newHomeViewModel= newHomeViewModel)
         }
         composable(route = ReaderScreens.SearchScreen.name) {
             val searchViewModel = hiltViewModel<SearchViewModel>()
@@ -68,9 +66,8 @@ fun ReaderNavigation() {
             )
         ) { navBackStackEntry ->
             navBackStackEntry.arguments?.getString("bookId")?.let { bookId ->
-                val homeViewModel = hiltViewModel<HomeViewModel>()
                 val newHomeViewModel = hiltViewModel<NewHomeViewModel>()
-                UpdateScreen(navController, homeViewModel, newHomeViewModel, bookId)
+                UpdateScreen(navController, newHomeViewModel, bookId)
             }
         }
         composable(route = ReaderScreens.ReaderStatsScreen.name) {

@@ -1,14 +1,11 @@
 package com.maddy.jetpackbookreader.di
 
 import com.google.firebase.firestore.FirebaseFirestore
+import com.maddy.jetpackbookreader.common.utils.ReaderConstants
+import com.maddy.jetpackbookreader.features.home.data.repository.NewFireRepository
+import com.maddy.jetpackbookreader.features.search.data.repository.SearchBookRepository
+import com.maddy.jetpackbookreader.features.search.data.repository.SearchBookRepositoryImpl
 import com.maddy.jetpackbookreader.network.BooksApi
-import com.maddy.jetpackbookreader.repository.BookRepository
-import com.maddy.jetpackbookreader.repository.BookRepositoryImpl
-import com.maddy.jetpackbookreader.repository.FireRepository
-import com.maddy.jetpackbookreader.repository.NewFireRepository
-import com.maddy.jetpackbookreader.repository.RemoteBookRepository
-import com.maddy.jetpackbookreader.repository.RemoteBookRepositoryImpl
-import com.maddy.jetpackbookreader.utils.ReaderConstants
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -32,17 +29,7 @@ object AppModule {
 
     @Singleton
     @Provides
-    fun provideRemoteBookRepository(api: BooksApi): RemoteBookRepository =
-        RemoteBookRepositoryImpl(api)
-
-    @Singleton
-    @Provides
-    fun provideBookRepository(api: BooksApi): BookRepository = BookRepositoryImpl(api)
-
-    @Singleton
-    @Provides
-    fun provideFireRepository() =
-        FireRepository(firestoreQuery = FirebaseFirestore.getInstance().collection("books"))
+    fun provideSearchBookRepository(api: BooksApi): SearchBookRepository = SearchBookRepositoryImpl(api)
 
     @Singleton
     @Provides
